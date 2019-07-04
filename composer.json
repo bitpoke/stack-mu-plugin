@@ -1,0 +1,15 @@
+{
+    "name": "presslabs/stack-mu-plugin",
+    "description": "WordPress must-use plugin for Stack",
+    "license": "Apache 2.0",
+    "authors": [
+        {
+            "name": "Presslabs",
+            "email": "ping@presslabs.com"
+        }
+    ],
+    "type": "wordpress-muplugin",
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
