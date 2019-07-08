@@ -1,7 +1,9 @@
 <?php
 
-//die(constant('MEMCACHED_DISCOVERY_HOST'));
-if (constant('MEMCACHED_DISCOVERY_HOST') || (defined('MEMCACHED_HOST') and MEMCACHED_HOST != '')):
+define('MEMCACHED_HOST', getenv('MEMCACHED_HOST'));
+define('MEMCACHED_DISCOVERY_HOST', getenv('MEMCACHED_DISCOVERY_HOST'));
+
+if (MEMCACHED_DISCOVERY_HOST != "" || MEMCACHED_HOST != ""):
 
 /**
  * Adds a value to cache.
@@ -140,12 +142,12 @@ function wp_cache_decr( $key, $offset = 1, $group = '' ) {
 /**
  * Sets up Object Cache Global and assigns it.
  *
- * @global  WP_Object_Cache     $wp_object_cache    WordPress Object Cache
+ * @global  Stack_Object_Cache     $wp_object_cache    WordPress Object Cache
  * @return  void
  */
 function wp_cache_init() {
     global $wp_object_cache;
-    $wp_object_cache = new WP_Object_Cache();
+    $wp_object_cache = new Stack_Object_Cache();
 }
 
 /**
@@ -199,7 +201,7 @@ function wp_cache_close() {
 }
 
 
-class WP_Object_Cache {
+class Stack_Object_Cache {
     /** @var \Stack\ObjectCache */
     private $backend;
 

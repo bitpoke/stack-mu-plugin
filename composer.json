@@ -10,8 +10,7 @@
     ],
     "type": "wordpress-muplugin",
     "require": {
-        "composer/installers": "~1.0",
-        "vlucas/phpdotenv": "^3.4"
+        "composer/installers": "~1.0"
     },
     "config": {
         "optimize-autoloader": true
@@ -20,6 +19,6 @@
         "psr-4": {
             "Stack\\": "src/Stack/"
         },
-        "files": ["src/mu-plugin.php", "src/object-cache.php"]
+        "files": ["src/object-cache.php"]
     }
 }
