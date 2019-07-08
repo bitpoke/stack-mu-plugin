@@ -1,5 +1,6 @@
 <?php
 namespace Stack\ObjectCache;
+die('#######');
 
 class Memcached implements \Stack\ObjectCache
 {

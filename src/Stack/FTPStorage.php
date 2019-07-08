@@ -3,7 +3,6 @@ namespace Stack;
 
 class FTPStorage
 {
-
     // URI of the FTP server.
     private $ftpHost = null;
 

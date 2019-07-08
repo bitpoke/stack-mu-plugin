@@ -1,8 +1,6 @@
 <?php
-// vim: set ft=php:
 
-Stack\Config::loadDefaults();
-
+//die(constant('MEMCACHED_DISCOVERY_HOST'));
 if (constant('MEMCACHED_DISCOVERY_HOST') || (defined('MEMCACHED_HOST') and MEMCACHED_HOST != '')):
 
 /**
@@ -202,11 +200,11 @@ function wp_cache_close() {
 
 
 class WP_Object_Cache {
-    /** @var Stack\ObjectCache */
+    /** @var \Stack\ObjectCache */
     private $backend;
 
     public function __construct() {
-        $backend = new Stack\ObjectCache\Memcached();
+        $backend = new \Stack\ObjectCache\Memcached();
         $this->backend = $backend;
     }
 
@@ -266,13 +264,13 @@ class WP_Object_Cache {
         return $this->backend->decrement( $key, $offset, $group );
     }
 
-	public function close() {
-		return $this->backend->close();
-	}
+    public function close() {
+        return $this->backend->close();
+    }
 
-	public function stats() {
-		return $this->backend->stats();
-	}
+    public function stats() {
+        return $this->backend->stats();
+    }
 }
 
 endif;
