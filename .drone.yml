@@ -1,7 +1,7 @@
 matrix:
   include:
-    - PHP_VERSION: 7.3.4
-    - PHP_VERSION: 7.2.17
+    - PHP_VERSION: 7.3.7
+    - PHP_VERSION: 7.2.15
 
 clone:
   git:
@@ -15,7 +15,7 @@ pipeline:
       - chown -R www-data:www-data /drone/src
 
   test:
-    image: quay.io/presslabs/php-runtime:testing-${DRONE_BRANCH}-${PHP_VERSION}
+    image: quay.io/presslabs/php-runtime:${PHP_VERSION}
     pull: true # allways pull the latest tag
     environment:
       - DB_TEST_HOST=database
@@ -53,3 +53,4 @@ services:
       interval: 2s
       timeout: 10s
       retries: 5
+
