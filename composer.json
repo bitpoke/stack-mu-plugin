@@ -1,5 +1,5 @@
 {
-    "name": "presslabs/stack-mu-plugin",
+    "name": "presslabs-stack/wordpress-mu-plugin",
     "description": "WordPress must-use plugin for Stack",
     "license": "Apache 2.0",
     "authors": [
