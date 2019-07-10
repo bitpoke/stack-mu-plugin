@@ -1,0 +1,55 @@
+matrix:
+  include:
+    - PHP_VERSION: 7.3.4
+    - PHP_VERSION: 7.2.17
+
+clone:
+  git:
+    image: plugins/git
+    tags: true
+
+pipeline:
+  chown: # we need to do this since our test container runs with www-data and drone clones with root
+    image: debian:stretch-slim
+    commands:
+      - chown -R www-data:www-data /drone/src
+
+  test:
+    image: quay.io/presslabs/php-runtime:testing-${DRONE_BRANCH}-${PHP_VERSION}
+    pull: true # allways pull the latest tag
+    environment:
+      - DB_TEST_HOST=database
+      - DB_TEST_USER=wordpress
+      - DB_TEST_NAME=wordpress_tests
+      - DB_TEST_PASSWORD=not-so-secure-but-good-for-ci
+      - MEMCACHED_TEST_HOST=memcache:11211
+      - UPLOADS_FTP_HOST_TEST=ftp:2121
+      - COMPOSER_HOME=/drone/src/.composer
+    commands:
+      - composer install --no-ansi --prefer-dist
+      - make lint
+      - make test ARGS="--stop-on-failure"
+    when:
+      event: push
+
+services:
+  database:
+    image: percona:5.7
+    pull: true
+    environment:
+      - MYSQL_DATABASE=wordpress_tests
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=not-so-secure-but-good-for-ci
+      - MYSQL_ROOT_PASSWORD=insecure-root-password-but-good-for-ci
+
+  memcache:
+    image: memcached:1.5.10-alpine
+
+  ftp:
+    image: quay.io/presslabs/rclone
+    command: serve ftp .rclone-ftp --addr=0.0.0.0:2121
+    healthcheck:
+      test: ["CMD", "nc", "127.0.0.1", "2121"]
+      interval: 2s
+      timeout: 10s
+      retries: 5

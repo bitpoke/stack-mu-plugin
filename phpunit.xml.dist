@@ -1,0 +1,32 @@
+<phpunit
+    bootstrap="wordpress-develop/tests/phpunit/includes/bootstrap.php"
+    backupGlobals="false"
+    colors="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+>
+    <testsuites>
+        <!-- Default test suite to run all tests -->
+        <testsuite>
+            <directory suffix=".php">tests</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <const name="WP_RUN_CORE_TESTS" value="1" />
+    </php>
+    <listeners>
+        <listener class="SpeedTrapListener" file="wordpress-develop/tests/phpunit/includes/speed-trap-listener.php">
+            <arguments>
+                <array>
+                    <element key="slowThreshold">
+                        <integer>150</integer>
+                    </element>
+                </array>
+            </arguments>
+        </listener>
+    </listeners>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+</phpunit>

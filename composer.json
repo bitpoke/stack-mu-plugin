@@ -18,7 +18,25 @@
     "autoload": {
         "psr-4": {
             "Stack\\": "src/Stack/"
-        },
-        "files": ["src/object-cache.php"]
+        }
+    },
+    "require-dev": {
+        "roots/wordpress": "^5.2",
+        "phpunit/phpunit": "^6.5",
+        "oscarotero/env": "^1.2",
+        "vlucas/phpdotenv": "^2.0.1",
+        "roots/wp-config": "1.0.0"
+    },
+    "scripts": {
+        "lint": "phpcs",
+        "test": "phpunit"
+    },
+    "extra": {
+        "wordpress-install-dir": "web/wp",
+        "installer-paths": {
+            "web/wp-content/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+            "web/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+            "web/wp-content/themes/{$name}/": ["type:wordpress-theme"]
+        }
     }
 }

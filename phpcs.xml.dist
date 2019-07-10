@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<ruleset name="Apply PSR-2 Coding Standards">
+    <description>Apply PSR-2 Coding Standards</description>
+
+    <rule ref="PSR2">
+        <exclude-pattern>./src/object-cache.php</exclude-pattern>
+    </rule>
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>./src/Presslabs/ObjectCache.php</exclude-pattern>
+        <exclude-pattern>./src/Presslabs/ObjectCache/*</exclude-pattern>
+    </rule>
+
+    <arg name="extensions" value="php"/>
+
+    <!-- Strip the filepaths down to the relevant bit. -->
+    <arg name="basepath" value="./src"/>
+
+    <!-- Check up to 20 files simultanously. -->
+    <arg name="parallel" value="20"/>
+
+    <!-- Show sniff codes in all reports -->
+    <arg value="ps"/>
+
+    <file>./src</file>
+    <file>./tests</file>
+
+    <!-- Directories and third party library exclusions -->
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/hack/*</exclude-pattern>
+
+    <exclude-pattern>/tests/object-cache.php</exclude-pattern>
+</ruleset>
