@@ -16,7 +16,7 @@ dep:
 test: test-runtime test-wp
 
 .PHONY: test-runtime
-test-runtime: wordpress-develop wordpress-develop/wp-tests-config.php
+test-runtime: wordpress-develop wordpress-develop/wp-tests-config.php wordpress-develop/src/wp-content/object-cache.php
 	composer test -- --verbose \
 		$(ARGS)
 
@@ -27,6 +27,9 @@ test-wp: wordpress-develop/wp-tests-config.php
 		$(ARGS)
 
 wordpress-develop/wp-tests-config.php: hack/wp-tests-config.php
+	cp $< $@
+
+wordpress-develop/src/wp-content/object-cache.php: src/object-cache.php
 	cp $< $@
 
 .PHONY: wordpress-develop

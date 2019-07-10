@@ -1,7 +1,12 @@
 <?php
 
-define('MEMCACHED_HOST', getenv('MEMCACHED_HOST'));
-define('MEMCACHED_DISCOVERY_HOST', getenv('MEMCACHED_DISCOVERY_HOST'));
+if (!defined('MEMCACHED_HOST')) {
+    define('MEMCACHED_HOST', getenv('MEMCACHED_HOST'));
+}
+
+if (!defined('MEMCACHED_DISCOVERY_HOST')) {
+    define('MEMCACHED_DISCOVERY_HOST', getenv('MEMCACHED_DISCOVERY_HOST'));
+}
 
 if (MEMCACHED_DISCOVERY_HOST != "" || MEMCACHED_HOST != ""):
 

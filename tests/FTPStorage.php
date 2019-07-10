@@ -51,7 +51,8 @@ class FTPStorageTest extends \WP_UnitTestCase
     public function imageEditorDataProvider()
     {
         return [
-            [ 'WP_Image_Editor_Imagick', 'imagick' ],
+            // Waiting for https://core.trac.wordpress.org/ticket/42663
+            // [ 'WP_Image_Editor_Imagick', 'imagick' ],
             [ 'WP_Image_Editor_GD' ]
         ];
     }
