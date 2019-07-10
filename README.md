@@ -4,7 +4,7 @@ A Must Use plugin, that integrates all Stack's functionalities
 ## Install
 
 ```console
-$ composer require presslabs/stack-mu-plugin
+$ composer require presslabs-stack/wordpress-mu-plugin
 ```
 
 In order to use the custom object-cache, you'll need to copy it into the root of wp-content
