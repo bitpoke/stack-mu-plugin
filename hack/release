@@ -39,7 +39,7 @@ trap cleanup EXIT
 
 set -x
 git checkout -b "${RELEASE_BRANCH}"
-sed "s/Version: .*$/Version: ${VER}/" load.php > .load.php
+sed "s/Version: .*$/Version: ${VER#"v"}/" load.php > .load.php
 mv .load.php load.php
 git add load.php
 git commit -m "Release ${VER}"
