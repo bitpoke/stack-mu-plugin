@@ -1,5 +1,5 @@
 kind: pipeline
-name: default
+name: php-7.3
 
 clone:
   tags: true
@@ -8,6 +8,7 @@ steps:
   - name: test
     pull: always
     image: quay.io/presslabs/php-runtime:7.3.7
+    user: root
     commands:
     - composer install --no-ansi --prefer-dist
     - make lint
