@@ -55,6 +55,7 @@ Config::define('DB_COLLATE', '');
 $table_prefix = env('DB_TEST_PREFIX') ?: 'wptests_';
 
 Config::define('MEMCACHED_HOST', env('MEMCACHED_TEST_HOST') ?: 'localhost');
+Config::define('UPLOADS_FTP_HOST', env('UPLOADS_FTP_TEST_HOST') ?: 'localhost');
 
 Config::define('WP_TESTS_DOMAIN', env('WP_TESTS_DOMAIN') ?: 'example.org');
 Config::define('WP_TESTS_EMAIL', env('WP_TESTS_EMAIL') ?: 'admin@example.org');
