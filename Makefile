@@ -1,4 +1,4 @@
-WORDPRESS_DEVELOP_REF ?= master
+WORDPRESS_DEVELOP_REF ?= $(shell hack/wp-version-to-develop-ref.php)
 WORDPRESS_DEVELOP_GIT_REPO ?= https://github.com/WordPress/wordpress-develop.git
 
 PHPUNIT ?= $(PWD)/vendor/bin/phpunit

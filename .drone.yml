@@ -11,7 +11,8 @@ steps:
     commands:
     - composer install --no-ansi --prefer-dist
     - make lint
-    - make test ARGS="--stop-on-failure"
+    - make test
+      #- make test ARGS="--stop-on-failure"
     environment:
       DB_TEST_HOST: database
       DB_TEST_NAME: wordpress_tests
