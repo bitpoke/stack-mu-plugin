@@ -9,10 +9,31 @@
         <testsuite>
             <directory suffix=".php">tests</directory>
         </testsuite>
+
+        <filter>
+            <blacklist>
+                <file>/drone/src/wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+
+                <file>wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+                <file>./wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+
+                <file>tests/image/functions.php</file>
+                <file>./tests/image/functions.php</file>
+
+
+                <file>image/functions.php</file>
+                <file>./image/functions.php</file>
+
+                <file>functions.php</file>
+                <file>./functions.php</file>
+            </blacklist>
+        </filter>
     </testsuites>
+
     <php>
         <const name="WP_RUN_CORE_TESTS" value="1" />
     </php>
+
     <listeners>
         <listener class="SpeedTrapListener" file="wordpress-develop/tests/phpunit/includes/speed-trap-listener.php">
             <arguments>
@@ -24,9 +45,43 @@
             </arguments>
         </listener>
     </listeners>
+
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">src</directory>
+            <exclude>
+                <file>/drone/src/wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+
+                <file>wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+                <file>./wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+
+                <file>tests/image/functions.php</file>
+                <file>./tests/image/functions.php</file>
+
+
+                <file>image/functions.php</file>
+                <file>./image/functions.php</file>
+
+                <file>functions.php</file>
+                <file>./functions.php</file>
+            </exclude>
         </whitelist>
+
+        <blacklist>
+            <file>/drone/src/wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+
+            <file>wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+            <file>./wordpress-develop/tests/phpunit/tests/image/functions.php</file>
+
+            <file>tests/image/functions.php</file>
+            <file>./tests/image/functions.php</file>
+
+
+            <file>image/functions.php</file>
+            <file>./image/functions.php</file>
+
+            <file>functions.php</file>
+            <file>./functions.php</file>
+        </blacklist>
     </filter>
 </phpunit>
