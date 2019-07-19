@@ -17,9 +17,6 @@ test: test-runtime test-wp
 
 .PHONY: test-runtime
 test-runtime: wordpress-develop wordpress-develop/wp-tests-config.php wordpress-develop/src/wp-content/object-cache.php
-	ls -la /drone/src/wordpress-develop/build/
-	ls -la /drone/src/wordpress-develop/build/wp-admin/
-	ls -la /drone/src/wordpress-develop/build/wp-admin/includes/
 	composer test -- --verbose \
 		$(ARGS)
 

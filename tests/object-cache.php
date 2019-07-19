@@ -20,13 +20,15 @@ class TestObjectCache extends \WP_UnitTestCase {
     function testAlloptionsDataraceCondition() {
         global $wpdb;
         mysqli_close( $wpdb->dbh ); //disconnect from db before fork
+
         $pid = pcntl_fork();
         $wpdb->db_connect(); // reconnect to the db after fork in both processes
+
         if ( $pid == -1 ) {
             $this->fail('could not fork');
         } elseif ( $pid ) {
             pcntl_waitpid( $pid, $status );
-            $this->assertEquals( 0, $status ); //child exited successfully
+            $this->assertEquals( 0, $status ); // child exited successfully
             $this->assertTrue( add_option( 'one', 1 ) );
         } else {
             wp_cache_init(); // reinitialize the cache for child subprocess

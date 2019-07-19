@@ -19,7 +19,8 @@ class FTPStorageTest extends \WP_UnitTestCase
      */
     private function setupTestCase()
     {
-        $this->ftpStorage = new \Stack\FTPStorage(getenv('UPLOADS_FTP_TEST_HOST', true));
+        $ftpHost = getenv('UPLOADS_FTP_TEST_HOST', true) ?: 'localhost:2121';
+        $this->ftpStorage = new \Stack\FTPStorage($ftpHost);
 
         // workaround for https://bugs.php.net/bug.php?id=77680
         $this->ftpStorage->setPrefix(self::TESTS_NAMESPACE);
