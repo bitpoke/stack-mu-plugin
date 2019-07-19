@@ -2,6 +2,8 @@ WORDPRESS_DEVELOP_REF ?= $(shell hack/wp-version-to-develop-ref.php)
 WORDPRESS_DEVELOP_GIT_REPO ?= https://github.com/WordPress/wordpress-develop.git
 
 PHPUNIT ?= $(PWD)/vendor/bin/phpunit
+SKIPPED_TESTS := $(shell paste -s -d'|' hack/skip-wp-tests)<Paste>
+
 ARGS ?=
 
 .PHONY: lint
@@ -24,6 +26,7 @@ test-runtime: wordpress-develop wordpress-develop/wp-tests-config.php wordpress-
 test-wp: wordpress-develop/wp-tests-config.php
 	cd wordpress-develop && $(PHPUNIT) --verbose \
 		--exclude-group ajax,ms-files,ms-required,external-http,import \
+		--filter "^(?!($(SKIPPED_TESTS))).*$$" \
 		$(ARGS)
 
 wordpress-develop/wp-tests-config.php: hack/wp-tests-config.php

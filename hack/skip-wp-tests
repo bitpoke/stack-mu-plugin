@@ -1,0 +1,4 @@
+\Tests_Image_Functions::test_fallback_intermediate_image_sizes$
+\Tests_Image_Functions::test_crop_setting_for_pdf$
+\Tests_Image_Functions::test_pdf_preview_doesnt_overwrite_existing_jpeg$
+\Tests_Image_Functions::test_wp_generate_attachment_metadata_pdf$
