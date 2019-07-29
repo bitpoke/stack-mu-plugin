@@ -5,6 +5,13 @@ clone:
   tags: true
 
 steps:
+  - name: bundle
+    pull: always
+    image: quay.io/presslabs/bfc
+    user: root
+    commands:
+      - make bundle
+
   - name: test
     image: quay.io/presslabs/php-runtime:7.3.7
     user: root
@@ -23,6 +30,20 @@ steps:
     when:
       event:
       - push
+
+  - name: publish
+    image: plugins/github-release
+    settings:
+      api_key:
+        from_secret: GH_TOKEN
+      files:
+        - dist/*
+      checksum:
+        - md5
+        - sha1
+        - sha512
+    when:
+      event: tag
 
 services:
   - name: database

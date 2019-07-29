@@ -2,3 +2,7 @@
 vendor/
 wp/
 wordpress-develop/
+bundle/
+dist/
+stack-mu-plugin.zip
+stack-mu-plugin.tar.gz
