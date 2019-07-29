@@ -1,13 +1,18 @@
 {
-    "name": "presslabs-stack/wordpress-mu-plugin",
+    "name": "presslabs/stack-mu-plugin",
     "description": "WordPress must-use plugin for Stack",
     "license": "Apache-2.0",
     "authors": [
         {
             "name": "Presslabs",
-            "email": "ping@presslabs.com"
+            "email": "ping@presslabs.com",
+            "homepage": "http://www.presslabs.com/stack"
         }
     ],
+    "support": {
+        "issues": "https://github.com/presslabs/stack-mu-plugin/issues",
+        "docs": "https://presslabs.com/docs/stack"
+    },
     "type": "wordpress-muplugin",
     "require": {
         "vlucas/phpdotenv": "^2.0.1",
