@@ -56,5 +56,5 @@ bundle:
 	cp -a README.md LICENSE composer.json composer.lock src bundle/stack-mu-plugin
 	sed 's/Version: .*/Version: $(GIT_VERSION:v%=%)/g' stack-mu-plugin.php > bundle/stack-mu-plugin/stack-mu-plugin.php
 	cd bundle/stack-mu-plugin && composer install --no-dev --no-scripts --prefer-dist --ignore-platform-reqs -o
-	cd bundle && tar -zcf ../dist/stack-mu-plugins.tar.gz stack-mu-plugin
+	cd bundle && tar -zcf ../dist/stack-mu-plugin.tar.gz stack-mu-plugin
 	cd bundle && zip -r ../dist/stack-mu-plugin.zip stack-mu-plugin
