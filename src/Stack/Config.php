@@ -10,6 +10,11 @@ class Config
         if ($runCount > 0) {
             return;
         }
+        /*
+         * Expose global env() function from oscarotero/env
+         */
+        \Env::init();
+
         self::defineFromEnv("DOBJECT_CACHE_PRELOAD", false);
 
         self::defineFromEnv("MEMCACHED_HOST", "");
