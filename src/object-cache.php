@@ -152,7 +152,7 @@ function wp_cache_decr( $key, $offset = 1, $group = '' ) {
  */
 function wp_cache_init() {
     global $wp_object_cache;
-    $wp_object_cache = new Stack_Object_Cache();
+    $wp_object_cache = new WP_Object_Cache();
 }
 
 /**
@@ -206,7 +206,7 @@ function wp_cache_close() {
 }
 
 
-class Stack_Object_Cache {
+class WP_Object_Cache {
     /** @var \Stack\ObjectCache */
     private $backend;
 
