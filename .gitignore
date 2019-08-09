@@ -7,3 +7,4 @@ dist/
 stack-mu-plugin.zip
 stack-mu-plugin.tar.gz
 .build
+.env

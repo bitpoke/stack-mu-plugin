@@ -48,7 +48,7 @@ Config::define('WP_DEBUG', true);
 // DO NOT use a production database or one that is shared with something else.
 Config::define('DB_NAME', env('DB_TEST_NAME') ?: 'wordpress_tests');
 Config::define('DB_USER', env('DB_TEST_USER') ?: 'wordpress');
-Config::define('DB_PASSWORD', env('DB_TEST_PASSWORD') ?: 'wordpress');
+Config::define('DB_PASSWORD', env('DB_TEST_PASSWORD') ?: '');
 Config::define('DB_HOST', env('DB_TEST_HOST') ?: '127.0.0.1');
 Config::define('DB_CHARSET', 'utf8mb4');
 Config::define('DB_COLLATE', '');
