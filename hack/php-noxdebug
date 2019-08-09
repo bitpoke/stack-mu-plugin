@@ -1,0 +1,19 @@
+#!/bin/bash
+set -eo pipefail
+
+PHP_INI_FILE="$(mktemp -t php.XXXX)"
+
+trap cleanup EXIT
+
+cleanup() {
+    rm -rf "${PHP_INI_FILE}"
+}
+
+php_no_xdebug () {
+    # Using awk to ensure that files ending without newlines do not lead to configuration error
+    php -i | grep "\.ini" | grep -o -e '\(/[a-z0-9._-]\+\)\+\.ini' | grep -v xdebug | xargs awk 'FNR==1{print ""}1' | grep -v xdebug > "$PHP_INI_FILE"
+
+    php -n -c "$PHP_INI_FILE" "$@"
+}
+
+php_no_xdebug "$@"

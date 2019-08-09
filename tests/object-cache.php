@@ -8,10 +8,6 @@ class TestObjectCache extends \WP_UnitTestCase {
         parent::setUp();
     }
 
-    function testClassWPObjectCacheExists() {
-        $this->assertTrue( class_exists( 'Stack_Object_Cache' ) );
-    }
-
     function testObjectCacheBackendIsMemcache() {
         global $wp_object_cache;
         $this->assertEquals( $wp_object_cache->getBackendClass(), "Stack\ObjectCache\Memcached" );

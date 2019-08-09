@@ -5,14 +5,21 @@ clone:
   tags: true
 
 steps:
-  - name: test
+  - name: dependencies
     image: quay.io/presslabs/php-runtime:7.3.7
     user: root
     commands:
-    - composer install --no-ansi --prefer-dist
-    - make lint
-    - make test
-      #- make test ARGS="--stop-on-failure"
+      - composer install --prefer-dist
+
+  - name: lint
+    image: quay.io/presslabs/php-runtime:7.3.7
+    user: root
+    commands:
+      - make lint
+
+  - name: test
+    image: quay.io/presslabs/php-runtime:7.3.7
+    user: root
     environment:
       DB_TEST_HOST: database
       DB_TEST_NAME: wordpress_tests
@@ -20,9 +27,21 @@ steps:
       DB_TEST_USER: wordpress
       MEMCACHED_TEST_HOST: memcache:11211
       UPLOADS_FTP_TEST_HOST: ftp:2121
-    when:
-      event:
-      - push
+    commands:
+      - make test-runtime
+
+  - name: integration test
+    image: quay.io/presslabs/php-runtime:7.3.7
+    user: root
+    environment:
+      DB_TEST_HOST: database
+      DB_TEST_NAME: wordpress_tests
+      DB_TEST_PASSWORD: not-so-secure-but-good-for-ci
+      DB_TEST_USER: wordpress
+      MEMCACHED_TEST_HOST: memcache:11211
+      UPLOADS_FTP_TEST_HOST: ftp:2121
+    commands:
+      - make test-wp
 
   - name: bundle
     pull: always
