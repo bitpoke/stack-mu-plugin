@@ -30,7 +30,12 @@ if (file_exists($root_dir . '/.env')) {
  */
 Config::define('WP_DEFAULT_THEME', env('WP_DEFAULT_THEME') ?: 'default');
 
-Config::define('STACK_MEDIA_BUCKET', "objcache://localhost");
+$tempfile=tempnam(sys_get_temp_dir(),'');
+unlink($tempfile);
+mkdir($tempfile);
+register_shutdown_function(function() use ($tempfile) { `rm -rf "$tempfile"`; });
+
+Config::define('STACK_MEDIA_BUCKET', "file://$tempfile");
 
 // Test with multisite enabled.
 // Alternatively, use the tests/phpunit/multisite.xml configuration file.
