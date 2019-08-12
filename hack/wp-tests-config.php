@@ -14,9 +14,12 @@ Env::init();
 /**
  * Use Dotenv to set required environment variables and load .env file in root
  */
-$dotenv = new Dotenv\Dotenv($root_dir);
+$dotenv = Dotenv\Dotenv::create($root_dir);
 if (file_exists($root_dir . '/.env')) {
     $dotenv->load();
+    if (!env('DATABASE_TEST_URL')) {
+        $dotenv->required(['DB_TEST_NAME', 'DB_TEST_USER', 'DB_TEST_PASSWORD']);
+    }
 }
 
 /*

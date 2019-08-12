@@ -15,8 +15,8 @@
     },
     "type": "wordpress-muplugin",
     "require": {
-        "vlucas/phpdotenv": "^2.0.1",
-        "oscarotero/env": "^1.2",
+        "vlucas/phpdotenv": "^3.4.0",
+        "oscarotero/env": "^1.2.0",
         "composer/installers": "~1.0"
     },
     "config": {
