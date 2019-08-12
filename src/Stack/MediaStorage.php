@@ -3,14 +3,49 @@ namespace Stack;
 
 use \add_filter;
 use \remove_filter;
+use \path_is_absolute;
 
 class MediaStorage
 {
+    /**
+     * @var string
+     */
+    private $relUploadsDir = null;
+
     public function __construct()
     {
-        $blobStore = new \Stack\BlobStore\WordPressObjectCache();
-        $fs = \Stack\MediaFilesystem\StreamWrapper::register($blobStore);
+        $this->relUploadsDir = trim(defined(STACK_MEDIA_PATH) ? STACK_MEDIA_PATH : 'wp-content/uploads', '/');
+
+        $parts = parse_url(STACK_MEDIA_BUCKET);
+
+        switch ($parts['scheme']) {
+            case 'objcache':
+                $blobStore = new \Stack\BlobStore\WordPressObjectCache();
+                break;
+            case 'file':
+            case '':
+                $blobStore = $this->getLocalFilesystemBlobStore($parts['path']);
+                break;
+            default:
+                wp_die('Invalid protocol <code>' . $parts['scheme'] . '</code> for media storage.');
+        }
+
+
+        $fs = \Stack\MediaFilesystem\StreamWrapper::register($blobStore, "media");
         $this->register();
+    }
+
+    /*
+     * Returns a LocalFilesystem BlobStore taking into account WordPress particularities
+     */
+    private function getLocalFilesystemBlobStore(string $path = '')
+    {
+        if (empty($path)) {
+        }
+        if ($this->endsWith($path, '/' . $this->relUploadsDir)) {
+            $path = substr($path, 0, -strlen('/' . $this->relUploadsDir));
+        }
+        return new \Stack\BlobStore\LocalFilesystem($path);
     }
 
     public function register()
@@ -75,10 +110,22 @@ class MediaStorage
         return $filePath;
     }
 
-    private function startsWith(string $path, string $prefix) : bool
+    private function startsWith(string $haystack, string $needle) : bool
     {
-        return substr($path, 0, strlen($prefix)) == $prefix;
+        $length = strlen($needle);
+        return (substr($haystack, 0, $length) === $needle);
     }
+
+    private function endsWith(string $haystack, string $needle) : bool
+    {
+        $length = strlen($needle);
+        if ($length == 0) {
+            return true;
+        }
+
+        return (substr($haystack, -$length) === $needle);
+    }
+
 
     private function removePrefix(string $path, string $prefix) : string
     {
@@ -98,8 +145,6 @@ class MediaStorage
      */
     private function getUploadsDir() : string
     {
-        $uploadsDir = defined('UPLOADS') ? trim(UPLOADS, '/') : 'wp-content/uploads';
-        $path = $this->getPath($uploadsDir);
-        return $path;
+        return $this->getPath($this->relUploadsDir);
     }
 }

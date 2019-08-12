@@ -30,6 +30,8 @@ if (file_exists($root_dir . '/.env')) {
  */
 Config::define('WP_DEFAULT_THEME', env('WP_DEFAULT_THEME') ?: 'default');
 
+Config::define('STACK_MEDIA_BUCKET', "objcache://localhost");
+
 // Test with multisite enabled.
 // Alternatively, use the tests/phpunit/multisite.xml configuration file.
 // define( 'WP_TESTS_MULTISITE', true );
