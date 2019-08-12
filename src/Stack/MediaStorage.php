@@ -53,6 +53,7 @@ class MediaStorage
         add_filter('upload_dir', [$this, 'filterUploadDir']);
         add_filter('wp_delete_file', [$this, 'filterDeleteFile']);
         add_filter('wp_image_editors', [$this, 'filterImageEditors']);
+        add_action('init', [$this, 'serveImage']);
     }
 
     public function unregister()
@@ -60,6 +61,25 @@ class MediaStorage
         remove_filter('upload_dir', [$this, 'filterUploadDir']);
         remove_filter('wp_delete_file', [$this, 'filterDeleteFile']);
         remove_filter('wp_image_editors', [$this, 'filterImageEditors']);
+        remove_action('init', [$this, 'serveImage']);
+    }
+
+    public function serveImage()
+    {
+        $upload = wp_upload_dir();
+        $request = (is_ssl() ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        if ($this->startsWith($request, $upload['baseurl'])) {
+            $path = substr($request, strlen($upload['baseurl']));
+            $filetype = wp_check_filetype($path);
+
+            if (empty($filetype['ext'])) {
+                wp_die("Directory listing disabled.", "UNAUTHORIZED", 403);
+            } else {
+                header('Content-Type: ' . $filetype['type']);
+                readfile('media://' . $this->relUploadsDir . $path);
+                die();
+            }
+        }
     }
 
     public function filterImageEditors(array $image_editors) : array
