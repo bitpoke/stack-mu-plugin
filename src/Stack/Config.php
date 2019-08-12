@@ -15,6 +15,23 @@ class Config
          */
         \Env::init();
 
+        $uploads = wp_upload_dir(null, false, false);
+        $siteurl = get_option('siteurl');
+
+        /*
+         * uploads dir relative to webroot
+         * this takes into account CONTENT_DIR (defined by bedrock setups)
+         * and defaults to `wp-content/uploads`
+         */
+        if ($siteurl === substr($uploads['baseurl'], 0, strlen($siteurl))) {
+            $relUploadsDir = substr($uploads['baseurl'], strlen($siteurl));
+        } else {
+            $relUploadsDir = (defined('CONTENT_DIR') ? CONTENT_DIR : '/wp-content') . '/uploads';
+        }
+        $relUploadsDir = ltrim($relUploadsDir, '/');
+        self::defineFromEnv("STACK_MEDIA_PATH", env('MEDIA_PATH') ?: $relUploadsDir, '/');
+        self::defineFromEnv("STACK_MEDIA_BUCKET", env('MEDIA_BUCKET') ?: "file://" . $uploads['basedir']);
+
         self::defineFromEnv("DOBJECT_CACHE_PRELOAD", false);
 
         self::defineFromEnv("MEMCACHED_HOST", "");
