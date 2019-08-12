@@ -52,12 +52,25 @@ class MediaStorage
     {
         add_filter('upload_dir', [$this, 'filterUploadDir']);
         add_filter('wp_delete_file', [$this, 'filterDeleteFile']);
+        add_filter('wp_image_editors', [$this, 'filterImageEditors']);
     }
 
     public function unregister()
     {
         remove_filter('upload_dir', [$this, 'filterUploadDir']);
         remove_filter('wp_delete_file', [$this, 'filterDeleteFile']);
+        remove_filter('wp_image_editors', [$this, 'filterImageEditors']);
+    }
+
+    public function filterImageEditors(array $image_editors) : array
+    {
+        $editors = array();
+        foreach ($image_editors as $editor) {
+            if ($editor != 'WP_Image_Editor_Imagick') {
+                $editors []= $editor;
+            }
+        }
+        return $editors;
     }
 
     /**
