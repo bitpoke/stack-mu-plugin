@@ -7,17 +7,9 @@ class MediaStorageTest extends \WP_UnitTestCase
 
     public function setUp()
     {
-        $this->mediaStoragePlugin = new \Stack\MediaStorage();
-        $this->mediaStoragePlugin->register();
-
         require_once(ABSPATH . WPINC . '/class-wp-image-editor.php');
         require_once(ABSPATH . WPINC . '/class-wp-image-editor-gd.php');
         require_once(ABSPATH . WPINC . '/class-wp-image-editor-imagick.php');
-    }
-
-    public function tearDown()
-    {
-        $this->mediaStoragePlugin->unregister();
     }
 
     public function imageEditorDataProvider()
@@ -29,8 +21,14 @@ class MediaStorageTest extends \WP_UnitTestCase
         ];
     }
 
+    public function testMediaFilesystemIsEnabled()
+    {
+        $this->assertContains("media", stream_get_wrappers());
+        $path = wp_upload_dir()['path'];
+        $this->assertStringStartsWith("media://", $path);
+    }
+
     /**
-     * @slowThreshold 2000
      * @dataProvider imageEditorDataProvider
      */
     public function testImageUpload($editor, $requiredExtension = null)

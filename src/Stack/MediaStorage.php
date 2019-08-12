@@ -10,6 +10,7 @@ class MediaStorage
     {
         $blobStore = new \Stack\BlobStore\WordPressObjectCache();
         $fs = \Stack\MediaFilesystem\StreamWrapper::register($blobStore);
+        $this->register();
     }
 
     public function register()

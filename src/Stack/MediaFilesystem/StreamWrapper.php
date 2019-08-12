@@ -400,19 +400,7 @@ class StreamWrapper
             'blocks'  => 0,
         );
 
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        /**
-         * If the file is actually just a path to a directory
-         * then return it as always existing. This is to work
-         * around wp_upload_dir doing file_exists checks on
-         * the uploads directory on every page load.
-         *
-         * Added by Joe Hoyle
-         *
-         * Hanif's note: Copied from humanmade's S3 plugin
-         *              https://github.com/humanmade/S3-Uploads
-         */
-        if (! $extension) {
+        if ($this->is_dir($path)) {
             return $stats;
         }
 
@@ -511,7 +499,7 @@ class StreamWrapper
      *
      * @param   string  $path
      * @param   int     $mode
-     * @param   in      $options
+     * @param   int     $options
      *
      * @return  bool
      */
@@ -519,6 +507,77 @@ class StreamWrapper
     {
         // Currently, it will always return true as directories are automatically created on the Filesystem API
         return true;
+    }
+
+    /**
+     * Called in response to opendir()
+     *
+     * @since   1.0.0
+     * @access  public
+     *
+     * @param   string  $path
+     * @param   int     $options
+     *
+     * @return  bool
+     */
+    public function dir_opendir($path, $options)
+    {
+        // Currently, returns true whenever the path is a directory
+        if ($this->is_dir($path)) {
+            $this->file = null;
+            $this->uri  = $path;
+            $this->path = $this->trim_path($path);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Called in response to closedir()
+     *
+     * @since   1.0.0
+     * @access  public
+     *
+     * @return  bool
+     */
+    public function dir_closedir()
+    {
+        // Currently, returns true whenever the path is a directory
+        if ($this->is_dir($this->uri)) {
+            $this->file = null;
+            $this->uri = null;
+            $this->path = null;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Called in response to rewinddir()
+     *
+     * @since   1.0.0
+     * @access  public
+     *
+     * @return  bool
+     */
+    public function dir_rewinddir()
+    {
+        // Currently, returns true whenever the path is a directory
+        return $this->is_dir($this->uri);
+    }
+
+    /**
+     * Called in response to readdir()
+     *
+     * @since   1.0.0
+     * @access  public
+     *
+     * @return  string|bool
+     */
+    public function dir_readdir()
+    {
+        // Currently, it will always return false as directories are automatically created on the Filesystem API
+        return false;
     }
 
     /**
@@ -625,5 +684,28 @@ class StreamWrapper
     protected function trim_path($path)
     {
         return ltrim($path, $this->protocol . ':/\\');
+    }
+
+    /**
+     * Checks if the specified path is a directory
+     *
+     * All paths without extensions are considered directories.
+     * This is to work around wp_upload_dir doing file_exists
+     * checks on the uploads directory on every page load.
+     *
+     * Copied from humanmade's S3 plugin
+     *     https://github.com/humanmade/S3-Uploads
+     *
+     * @since   1.0.0
+     * @access  protected
+     * @param   string      $path       Original protocol path
+     *
+     * @return  bool        Checks that the path is for a directory
+     */
+    protected function is_dir($path)
+    {
+        $path = $this->trim_path($path);
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        return empty($extension);
     }
 }
