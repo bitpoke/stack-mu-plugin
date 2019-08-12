@@ -114,15 +114,10 @@ class MediaStorageTest extends \WP_UnitTestCase
         }
     }
 
-    /**
-     * FTP directories should be readable
-     * TODO: test for writable once the following bug is fixed:
-     *      * https://bugs.php.net/bug.php?id=77765
-     */
-    public function testDirIsReadable()
+    public function testDirIsWritable()
     {
         $path = wp_upload_dir()['path'];
 
-        $this->assertDirectoryIsReadable($path);
+        $this->assertDirectoryIsWritable($path);
     }
 }

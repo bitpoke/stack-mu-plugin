@@ -22,6 +22,10 @@ class MediaStorage
             case 'objcache':
                 $blobStore = new \Stack\BlobStore\WordPressObjectCache();
                 break;
+            case 'gs':
+            case 'gcs':
+                $blobStore = new \Stack\BlobStore\GoogleCloudStorage($parts['host'], $parts['path'] ?: '');
+                break;
             case 'file':
             case '':
                 $blobStore = $this->getLocalFilesystemBlobStore($parts['path']);
@@ -29,7 +33,6 @@ class MediaStorage
             default:
                 wp_die('Invalid protocol <code>' . $parts['scheme'] . '</code> for media storage.');
         }
-
 
         $fs = \Stack\MediaFilesystem\StreamWrapper::register($blobStore, "media");
         $this->register();
