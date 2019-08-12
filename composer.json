@@ -14,6 +14,12 @@
         "docs": "https://presslabs.com/docs/stack"
     },
     "type": "wordpress-muplugin",
+    "repositories": [
+      {
+        "type": "composer",
+        "url": "https://wpackagist.org"
+      }
+    ],
     "require": {
         "vlucas/phpdotenv": "^3.4.0",
         "oscarotero/env": "^1.2.0",
@@ -35,7 +41,10 @@
         "roave/security-advisories": "dev-master",
         "roots/wordpress": "^5.2",
         "phpunit/phpunit": "^6.5",
-        "roots/wp-config": "1.0.0"
+        "roots/wp-config": "1.0.0",
+        "wpackagist-plugin/debug-bar": "^1.0",
+        "wpackagist-plugin/debug-bar-console": "^0.3.0",
+        "wpackagist-plugin/debug-bar-constants": "^2.0"
     },
     "scripts": {
         "lint": "phpcs",
