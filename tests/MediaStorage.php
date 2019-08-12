@@ -1,52 +1,23 @@
 <?php
-namespace Stack\Tests\FTPStorage;
+namespace Stack\Tests;
 
-class FTPStorageTest extends \WP_UnitTestCase
+class MediaStorageTest extends \WP_UnitTestCase
 {
+    private $mediaStoragePlugin = null;
 
-    // Keep track how many times we did the setup, in order to create a new env for each use case
-    private $run = 0;
-
-    // URI of the FTP server. Default: ftp://localhost:2121
-    private $ftpHost = null;
-
-    const TESTS_NAMESPACE = 'test';
-
-    /**
-     *  Initial setup for the entire test run.
-     *  It sets the FTP host used in tests, creates the initial test directory and set the prefix
-     *  in order to separate each test run environment.
-     */
-    private function setupTestCase()
+    public function setUp()
     {
-        $ftpHost = getenv('UPLOADS_FTP_TEST_HOST', true) ?: 'localhost:2121';
-        $this->ftpStorage = new \Stack\FTPStorage($ftpHost);
-
-        // workaround for https://bugs.php.net/bug.php?id=77680
-        $this->ftpStorage->setPrefix(self::TESTS_NAMESPACE);
-
-        $buildNumber = getenv('DRONE_BUILD_NUMBER', true);
-        $testPrefix = sprintf('%s/%s', self::TESTS_NAMESPACE, $buildNumber ? "ci-$buildNumber" : time());
-        $this->ftpStorage->setPrefix($testPrefix);
+        $this->mediaStoragePlugin = new \Stack\MediaStorage();
+        $this->mediaStoragePlugin->register();
 
         require_once(ABSPATH . WPINC . '/class-wp-image-editor.php');
         require_once(ABSPATH . WPINC . '/class-wp-image-editor-gd.php');
         require_once(ABSPATH . WPINC . '/class-wp-image-editor-imagick.php');
     }
 
-    public function setUp()
+    public function tearDown()
     {
-        parent::setUp();
-
-        // setup initial environment for the entire test case
-        if ($this->run == 0) {
-            $this->setupTestCase();
-        }
-
-        $this->run++;
-
-        // creates tests/:id/:run/wp-content/uploads
-        $this->ftpStorage->appendPrefix($this->run);
+        $this->mediaStoragePlugin->unregister();
     }
 
     public function imageEditorDataProvider()

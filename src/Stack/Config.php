@@ -20,8 +20,6 @@ class Config
         self::defineFromEnv("MEMCACHED_HOST", "");
         self::defineFromEnv("MEMCACHED_DISCOVERY_HOST", "");
 
-        self::defineFromEnv("UPLOADS_FTP_HOST", "");
-
         self::definePath("GIT_DIR", env("SRC_DIR") ?: "/var/run/presslabs.org/code/src");
         self::definePath("GIT_KEY_FILE", "/var/run/secrets/presslabs.org/instance/id_rsa");
         self::definePath("GIT_KEY_FILE", (rtrim(env("HOME"), '/') ?: "/var/www") . "/.ssh/id_rsa");
