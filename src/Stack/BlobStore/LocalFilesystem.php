@@ -23,7 +23,6 @@ class LocalFilesystem implements BlobStore
     public function get(string $key) : string
     {
         $path = path_join($this->uploadsDir, $key);
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>>> get %s\n", $path);
         if (!file_exists($path)) {
             throw new \Stack\BlobStore\Exceptions\NotFound(sprintf("%s not found", $key));
         }
@@ -37,7 +36,6 @@ class LocalFilesystem implements BlobStore
     public function getMeta(string $key)
     {
         $path = path_join($this->uploadsDir, $key);
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>>> getMeta %s\n", $path);
         if (!is_file($path)) {
             throw new \Stack\BlobStore\Exceptions\NotFound(sprintf("%s not found", $key));
         }
@@ -49,7 +47,6 @@ class LocalFilesystem implements BlobStore
     public function set(string $key, string $content)
     {
         $path = path_join($this->uploadsDir, $key);
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>>> set %s\n", $path);
         $dir = dirname($path);
         if (false === wp_mkdir_p($dir)) {
             throw new \Exception(sprintf("Could not create directory '%s'", $dir));
@@ -62,7 +59,6 @@ class LocalFilesystem implements BlobStore
     public function remove(string $key)
     {
         $path = path_join($this->uploadsDir, $key);
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>>> remove %s\n", $path);
         if (false === unlink($path)) {
             throw new \Exception(sprintf("Could not remove blob at key '%s'", $key));
         }
