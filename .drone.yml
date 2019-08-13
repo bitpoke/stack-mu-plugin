@@ -26,7 +26,6 @@ steps:
       DB_TEST_PASSWORD: not-so-secure-but-good-for-ci
       DB_TEST_USER: wordpress
       MEMCACHED_TEST_HOST: memcache:11211
-      UPLOADS_FTP_TEST_HOST: ftp:2121
     commands:
       - make test-runtime
 
@@ -39,7 +38,6 @@ steps:
       DB_TEST_PASSWORD: not-so-secure-but-good-for-ci
       DB_TEST_USER: wordpress
       MEMCACHED_TEST_HOST: memcache:11211
-      UPLOADS_FTP_TEST_HOST: ftp:2121
     commands:
       - make test-wp
 
@@ -77,7 +75,3 @@ services:
 
   - name: memcache
     image: memcached:1.5.10-alpine
-
-  - name: ftp
-    image: quay.io/presslabs/rclone
-    command: ["serve", "ftp", "/", "--addr=0.0.0.0:2121"]
