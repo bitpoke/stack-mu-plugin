@@ -2,9 +2,15 @@ kind: pipeline
 name: php-7.3
 
 clone:
-  tags: true
+  disable: true
 
 steps:
+  - name: clone
+    image: plugins/git
+    settings:
+      depth: 0
+      tags: true
+
   - name: dependencies
     image: quay.io/presslabs/php-runtime:7.3.7
     user: root
