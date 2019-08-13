@@ -1,4 +1,12 @@
 <?php
+/**
+ * Plugin Name: Presslabs Stack Object Cache
+ * Plugin URI: http://presslabs.com/stack/
+ * Description: WordPress object cache backend for Presslabs Stack. This backend is based on memcached.
+ * Version: git+$Format:%H$
+ * Author: Presslabs
+ * Author URI: http://presslabs.com/
+ */
 
 if (!defined('MEMCACHED_HOST')) {
     define('MEMCACHED_HOST', getenv('MEMCACHED_HOST'));
@@ -211,6 +219,19 @@ class WP_Object_Cache {
     private $backend;
 
     public function __construct() {
+        // load Composer autoloader if bundled
+        if ( file_exists( __DIR__ . '/mu-plugins/stack-mu-plugin/vendor/autoload.php' ) ) {
+            // we are copied into WP_CONTENT_DIR
+            require_once __DIR__ . '/mu-plugins/stack-mu-plugin/vendor/autoload.php';
+        } elseif ( file_exists( dirname( __DIR__ ) . '/vendor/autoload.php' ) ) {
+            // we are symlinked into WP_CONTENT_DIR
+            require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+        }
+
+        if ( ! class_exists( '\Stack\ObjectCache\Memcached' ) ) {
+            wp_die( 'Presslabs Stack WordPress mu-plugin is not fully installed! Please install with Composer or download full release archive.');
+        }
+
         $backend = new \Stack\ObjectCache\Memcached();
         $this->backend = $backend;
     }

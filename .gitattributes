@@ -1,8 +1,9 @@
-.gitignore          export-ignore
-.gitattributes      export-ignore
-Makefile            export-ignore
-phpcs.xml*          export-ignore
-phpunit.xml*        export-ignore
-/hack               export-ignore
-/tests              export-ignore
-load.php            export-subst
+.gitignore           export-ignore
+.gitattributes       export-ignore
+Makefile             export-ignore
+phpcs.xml*           export-ignore
+phpunit.xml*         export-ignore
+/hack                export-ignore
+/tests               export-ignore
+stack-mu-plugin.php  export-subst
+src/object-cache.php export-subst
