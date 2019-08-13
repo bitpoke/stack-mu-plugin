@@ -1,26 +1,75 @@
-# stack-mu-plugin
-A Must Use plugin, that integrates all Stack's functionalities:
-    * patches the ftop directory in order to redirect uploads to a FTP server (rclone ftp server that manages a storage cloud bucket)
-    * custom object-cache that uses Memcached as backend 
+stack-mu-plugin
+[![Build Status](https://stack-ci.presslabs.net/api/badges/presslabs/stack-mu-plugin/status.svg)](https://stack-ci.presslabs.net/presslabs/stack-mu-plugin)
+===
+Presslabs Stack must use plugin for WordPress.
+
+It provides integration for [Presslabs Stack](https://www.presslabs.com/stack)
+functionalities with WordPress, such as:
+* uploading and serving media files from object storage systems such as
+  Google Cloud Storage or AWS S3
+* object-cache implementation on top of memcached
 
 ## Install
 
-```console
-$ composer require presslabs-stack/wordpress-mu-plugin
-```
+### Bedrock
 
-In order to use the custom object-cache, you'll need to copy it into the root of wp-content
+When using bedrock, just run:
 
 ```console
-$ cp src/object-cache.php <your-wp-install>/wp-content/
+$ composer require presslabs/stack-mu-plugin
 ```
 
-## Tests
+### WordPress plugin
 
-In order to run the tests locally, you can use Docker
-``` shell
-docker run -p 3306:3306 -e MYSQL_DATABASE=wordpress_tests -e MYSQL_USER=wordpress -e MYSQL_PASSWORD=wordpress -e MYSQL_ROOT_PASSWORD=wordpress mysql:5.7
-docker run -p 11211:11211 memcached:alpine
-rclone serve ftp . --addr 0.0.0.0:2121
-make test
+To run as WordPress classic mu-plugin, download the plugin archive from
+[https://github.com/presslabs/stack-mu-plugin/releases](https://github.com/presslabs/stack-mu-plugin/releases)
+and extract it into your `wp-content/mu-plugins` folder.
+
+Then you need to activate the mu-plugin, by copying `stack-mu-plugin.php` from
+`wp-content/mu-plugins/stakc-mu-plugin` into your `wp-content/mu-plugins`
+folder.
+
+```console
+$ cp wp-content/mu-plugins/stack-mu-plugin/stack-mu-plugin.php wp-content/mu-plugins/
+```
+
+### WordPress Object Cache
+
+In order to use the custom object cache, you'll need to copy it into the root of
+`WP_CONTENT_DIR` (usually `wp-content`).
+
+```console
+$ cp wp-content/mu-plugins/stack-mu-plugin/src/object-cache.php wp-content/
+```
+
+## Development
+
+Clone this repository, copy `.env.example` to `.env` and edit it accordingly.
+
+To install dependencies just run
+```console
+$ make dependencies
+```
+
+### Development server
+
+To start a local development server you need wp-cli installed. To start the
+development server, just run
+
+```console
+$ wp server
+```
+
+### Testing
+
+Running plugin tests:
+
+```console
+$ make test-runtime
+```
+
+Running integration tests:
+
+```console
+$ make test-runtime
 ```
