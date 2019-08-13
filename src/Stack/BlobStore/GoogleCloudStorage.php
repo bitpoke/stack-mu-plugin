@@ -32,25 +32,19 @@ class GoogleCloudStorage implements BlobStore
 
     public function __construct(string $bucket, string $prefix = '')
     {
-        if (!defined('STDERR')) {
-            define('STDERR', fopen('php://stderr', 'w'));
+        $clientConfig = [
+            'suppressKeyFileNotice' => getenv('SUPPRESS_GCLOUD_CREDS_WARNING') == 'true',
+        ];
+
+        $envCreds = getenv('GOOGLE_CREDENTIALS');
+        if (!empty($envCreds)) {
+            $envCreds = json_decode($envCreds, true);
+            $clientConfig['keyFile'] = $envCreds;
         }
-        putenv('SUPPRESS_GCLOUD_CREDS_WARNING=true');
-        $this->client = new StorageClient([
-            'suppressKeyFileNotice' => true,
-        ]);
+
+        $this->client = new StorageClient($clientConfig);
         $this->bucket = $bucket;
         $this->prefix = $prefix;
-    }
-
-    private function bt()
-    {
-        ob_start();
-        $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        foreach ($bt as $frame) {
-            echo @$frame["class"] . @$frame["type"] . @$frame["function"] . PHP_EOL;
-        }
-        // fprintf(STDERR, ob_get_clean());
     }
 
     private function normalizePath(string $path) : string
@@ -60,7 +54,6 @@ class GoogleCloudStorage implements BlobStore
 
     public function get(string $key) : string
     {
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>> get %s [%s] %s\n", $key, @$_REQUEST['action'], $_SERVER['REQUEST_URI']);
         try {
             $bucket = $this->client->bucket($this->bucket);
             $object = $bucket->object($this->normalizePath($key));
@@ -73,7 +66,6 @@ class GoogleCloudStorage implements BlobStore
 
     public function getMeta(string $key)
     {
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>> getMeta %s [%s]\n", $key, @$_REQUEST['action']);
         try {
             $bucket = $this->client->bucket($this->bucket);
             $object = $bucket->object($this->normalizePath($key));
@@ -92,7 +84,6 @@ class GoogleCloudStorage implements BlobStore
 
     public function set(string $key, string $content)
     {
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>> set %s len=%d [%s]\n", $key, strlen($content), @$_REQUEST['action']);
         try {
             $bucket = $this->client->bucket($this->bucket);
             $uploader = $bucket->upload($content, [
@@ -106,7 +97,6 @@ class GoogleCloudStorage implements BlobStore
 
     public function remove(string $key)
     {
-        // fprintf(STDERR, ">>>>>>>>>>>>>>>> remove %s [%s]\n", $key, @$_REQUEST['action']);
         try {
             $bucket = $this->client->bucket($this->bucket);
             $object = $bucket->object($this->normalizePath($key));
