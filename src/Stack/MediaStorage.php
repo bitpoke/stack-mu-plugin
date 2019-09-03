@@ -14,7 +14,7 @@ class MediaStorage
 
     public function __construct()
     {
-        $this->relUploadsDir = trim(defined(STACK_MEDIA_PATH) ? STACK_MEDIA_PATH : 'wp-content/uploads', '/');
+        $this->relUploadsDir = trim(defined('STACK_MEDIA_PATH') ? STACK_MEDIA_PATH : 'wp-content/uploads', '/');
 
         $parts = parse_url(STACK_MEDIA_BUCKET);
 
@@ -43,8 +43,6 @@ class MediaStorage
      */
     private function getLocalFilesystemBlobStore(string $path = '')
     {
-        if (empty($path)) {
-        }
         if ($this->endsWith($path, '/' . $this->relUploadsDir)) {
             $path = substr($path, 0, -strlen('/' . $this->relUploadsDir));
         }
