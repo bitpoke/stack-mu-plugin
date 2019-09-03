@@ -72,12 +72,15 @@ class MediaStorage
         if ($this->startsWith($request, $upload['baseurl'])) {
             $path = substr($request, strlen($upload['baseurl']));
             $filetype = wp_check_filetype($path);
+            $fullPath = 'media://' . $this->relUploadsDir . $path;
 
             if (empty($filetype['ext'])) {
                 wp_die("Directory listing disabled.", "UNAUTHORIZED", 403);
+            } elseif (!file_exists($fullPath)) {
+                wp_die("Not found.", "NOT FOUND", 404);
             } else {
                 header('Content-Type: ' . $filetype['type']);
-                readfile('media://' . $this->relUploadsDir . $path);
+                readfile($fullPath);
                 die();
             }
         }
