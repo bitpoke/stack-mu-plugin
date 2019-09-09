@@ -1,47 +1,70 @@
 <?xml version="1.0"?>
-<ruleset name="Apply PSR-2 Coding Standards">
-    <description>Apply PSR-2 Coding Standards</description>
+<ruleset name="Apply WordPress Coding Standards">
+    <description>WordPress Coding Standards</description>
 
-    <rule ref="PSR2">
-        <exclude-pattern>./src/object-cache.php</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/hack/*</exclude-pattern>
+    <exclude-pattern>/web/*</exclude-pattern>
+    <exclude-pattern>/wordpress/*</exclude-pattern>
+    <exclude-pattern>/wordpress-develop/*</exclude-pattern>
 
-        <exclude-pattern>/node_modules/*</exclude-pattern>
-        <exclude-pattern>/drone/src/github.com/presslabs/stack-mu-plugin/vendor/*</exclude-pattern>
-        <exclude-pattern>/hack/*</exclude-pattern>
-        <exclude-pattern>/web/*</exclude-pattern>
-        <exclude-pattern>/wordpress/*</exclude-pattern>
-        <exclude-pattern>/wordpress-develop/*</exclude-pattern>
-
-        <exclude-pattern>/tests/object-cache.php</exclude-pattern>
+    <rule ref="WordPress">
+        <!-- WordPress does not require @throws comment doctag -->
+        <exclude name="Squiz.Commenting.FunctionCommentThrowTag.Missing" />
     </rule>
 
-    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
-        <exclude-pattern>./src/Stack/ObjectCache.php</exclude-pattern>
-        <exclude-pattern>./src/Stack/ObjectCache/*</exclude-pattern>
-        <exclude-pattern>./src/Stack/MediaFilesystem/StreamWrapper.php</exclude-pattern>
+    <!-- Add in some extra rules from other standards. -->
+    <rule ref="Generic.CodeAnalysis.UnusedFunctionParameter"/>
+    <rule ref="Generic.Commenting.Todo"/>
+
+    <!-- Check for PHP cross-version compatibility. -->
+    <!--
+        To enable this, the PHPCompatibilityWP standard needs
+        to be installed.
+        See the readme for installation instructions:
+        https://github.com/PHPCompatibility/PHPCompatibilityWP
+        For more information, also see:
+        https://github.com/PHPCompatibility/PHPCompatibility
+    -->
+    <config name="testVersion" value="7.1-"/>
+    <rule ref="PHPCompatibilityWP"/>
+
+    <!--
+        To get the optimal benefits of using WPCS, we should add a couple of
+        custom properties.
+        Adjust the values of these properties to fit our needs.
+
+        For information on additional custom properties available, check out
+        the wiki:
+        https://github.com/WordPress/WordPress-Coding-Standards/wiki/Customizable-sniff-properties
+    -->
+    <config name="minimum_supported_wp_version" value="5.2"/>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="stack"/>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="stack"/>
+            </property>
+        </properties>
     </rule>
 
     <arg name="extensions" value="php"/>
 
     <!-- Strip the filepaths down to the relevant bit. -->
-    <arg name="basepath" value="./src"/>
+    <arg name="basepath" value="./includes"/>
 
     <!-- Check up to 20 files simultanously. -->
     <arg name="parallel" value="20"/>
 
     <!-- Show sniff codes in all reports -->
     <arg value="ps"/>
-
-    <file>./src</file>
-    <file>./tests</file>
-
-    <!-- Directories and third party library exclusions -->
-    <exclude-pattern>/node_modules/*</exclude-pattern>
-    <exclude-pattern>/drone/src/github.com/presslabs/stack-mu-plugin/vendor/*</exclude-pattern>
-    <exclude-pattern>/hack/*</exclude-pattern>
-    <exclude-pattern>/web/*</exclude-pattern>
-    <exclude-pattern>/wordpress/*</exclude-pattern>
-    <exclude-pattern>/wordpress-develop/*</exclude-pattern>
-
-    <exclude-pattern>/tests/object-cache.php</exclude-pattern>
 </ruleset>
