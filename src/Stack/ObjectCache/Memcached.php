@@ -154,6 +154,8 @@ class Memcached implements \Stack\ObjectCache
 
     private function initStats()
     {
+        $this->stats["get_hits"] = 0;
+        $this->stats["get_misses"] = 0;
         foreach (array('get', 'set', 'delete', 'multi_get') as $action) {
             $this->stats[$action] = 0;
             $this->stats["mc_$action"] = 0;
@@ -723,8 +725,10 @@ class Memcached implements \Stack\ObjectCache
             if (isset($this->cache[$derived_key]) && ! $force) {
                 $found = true;
                 if (is_object($this->cache[$derived_key])) {
+                    ++$this->stats['get_hits'];
                     return clone $this->cache[$derived_key];
                 } else {
+                    ++$this->stats['get_hits'];
                     return $this->cache[$derived_key];
                 }
             } elseif (in_array($group, $this->no_mc_groups)) {
@@ -746,6 +750,12 @@ class Memcached implements \Stack\ObjectCache
             }
 
             $found = true;
+        }
+
+        if ( $found ) {
+            ++$this->stats['get_hits'];
+        } else {
+            ++$this->stats['get_misses'];
         }
 
         return is_object($value) ? clone $value : $value;
@@ -1660,8 +1670,23 @@ class Memcached implements \Stack\ObjectCache
         $this->blog_prefix = ( is_multisite() ? $blog_id : $table_prefix ) . ':';
     }
 
-    public function stats()
-    {
-        return $this->stats;
+    /**
+     * Echoes the stats of the caching.
+     *
+     * Gives the cache hits, and cache misses. Also prints every cached group,
+     * key and the data.
+     *
+     * @since 2.0.0
+     */
+    public function stats() {
+        echo '<p>';
+        echo "<strong>Cache Hits:</strong> {$this->stats["get_hits"]}<br />";
+        echo "<strong>Cache Misses:</strong> {$this->stats["get_misses"]}<br />";
+        echo '</p>';
+        echo '<ul>';
+        foreach ( $this->cache as $group => $cache ) {
+            echo "<li><strong>Group:</strong> $group - ( " . number_format( strlen( serialize( $cache ) ) / KB_IN_BYTES, 2 ) . 'k )</li>';
+        }
+        echo '</ul>';
     }
 }
