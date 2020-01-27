@@ -752,7 +752,7 @@ class Memcached implements \Stack\ObjectCache
             $found = true;
         }
 
-        if ( $found ) {
+        if ($found) {
             ++$this->stats['get_hits'];
         } else {
             ++$this->stats['get_misses'];
@@ -1678,14 +1678,16 @@ class Memcached implements \Stack\ObjectCache
      *
      * @since 2.0.0
      */
-    public function stats() {
+    public function stats()
+    {
         echo '<p>';
         echo "<strong>Cache Hits:</strong> {$this->stats["get_hits"]}<br />";
         echo "<strong>Cache Misses:</strong> {$this->stats["get_misses"]}<br />";
         echo '</p>';
         echo '<ul>';
-        foreach ( $this->cache as $group => $cache ) {
-            echo "<li><strong>Group:</strong> $group - ( " . number_format( strlen( serialize( $cache ) ) / KB_IN_BYTES, 2 ) . 'k )</li>';
+        foreach ($this->cache as $group => $cache) {
+            $size = number_format(strlen(serialize($cache)) / KB_IN_BYTES, 2);
+            echo "<li><strong>Group:</strong> $group - ( " . $size . 'k )</li>';
         }
         echo '</ul>';
     }

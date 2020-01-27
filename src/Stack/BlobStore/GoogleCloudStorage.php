@@ -32,7 +32,7 @@ class GoogleCloudStorage implements BlobStore
 
     private function getClient()
     {
-        if ( null === $this->client ) {
+        if (null === $this->client) {
             $clientConfig = [
                 'suppressKeyFileNotice' => getenv('SUPPRESS_GCLOUD_CREDS_WARNING') == 'true',
             ];
