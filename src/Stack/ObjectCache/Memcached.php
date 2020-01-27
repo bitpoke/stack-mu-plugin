@@ -26,19 +26,12 @@ class Memcached implements \Stack\ObjectCache
     public $cache = array();
 
     /**
-     * List of key/groups to preload
-     *
-     * @var array
-     */
-    public $preload = array();
-
-    /**
      * List of global groups.
      *
      * @var array
      */
     public $global_groups = array('users', 'userlogins', 'usermeta', 'site-options', 'site-lookup', 'blog-lookup',
-                                  'blog-details', 'rss', 'object-cache-preload');
+                                  'blog-details', 'rss');
 
     /**
      * List of groups not saved to Memcached.
@@ -94,8 +87,6 @@ class Memcached implements \Stack\ObjectCache
             define('WP_CACHE_KEY_SALT', '1');
         }
 
-        $this->preloadEnabled = defined('OBJECT_CACHE_PRELOAD') && OBJECT_CACHE_PRELOAD;
-
         $server = explode(':', constant('MEMCACHED_HOST'));
         if (count($server) == 1) {
             $server[] = '11211';
@@ -149,7 +140,6 @@ class Memcached implements \Stack\ObjectCache
         }
 
         $this->initStats();
-        $this->preloadCache();
     }
 
     private function initStats()
@@ -164,7 +154,6 @@ class Memcached implements \Stack\ObjectCache
 
     public function close()
     {
-        $this->updatePreloadKeys();
         $this->cache = array();
     }
 
@@ -176,56 +165,6 @@ class Memcached implements \Stack\ObjectCache
         if (! in_array($option, Memcached::$updated_options)) {
             Memcached::$updated_options[] = $option;
         }
-    }
-
-    private function shouldPreload()
-    {
-        if (!$this->preloadEnabled) {
-            return false;
-        }
-
-        if ((defined('WP_CLI') && WP_CLI) || (defined('DOING_CRON') && DOING_CRON)) {
-            return false;
-        }
-
-        if (!in_array($_SERVER['REQUEST_METHOD'], array('GET', 'HEAD'))) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function preloadCache()
-    {
-        if (!$this->shouldPreload()) {
-            return;
-        }
-
-        $this->request_hash = md5(json_encode(array(
-            $_SERVER['HTTP_HOST'],
-            $_SERVER['REQUEST_URI'],
-        )));
-
-        $preload = $this->get($this->request_hash, 'object-cache-preload', true);
-        if (is_array($preload)) {
-            $this->preload = $preload;
-        } else {
-            $this->preload = array();
-        }
-
-        $this->getMulti(array_keys($this->preload), array());
-    }
-
-    public function updatePreloadKeys()
-    {
-        if (!$this->shouldPreload()) {
-            return;
-        }
-
-        if ($this->request_hash) {
-            $this->set($this->request_hash, $this->preload, 'object-cache-preload');
-        }
-        $this->preload = array();
     }
 
     /**
@@ -575,9 +514,6 @@ class Memcached implements \Stack\ObjectCache
     {
         $derived_key = $this->buildKey($key, $group);
 
-        if (array_key_exists($derived_key, $this->preload)) {
-            unset($this->preload[$derived_key]);
-        }
         // Remove from no_mc_groups array
         if (in_array($group, $this->no_mc_groups)) {
             if (isset($this->cache[$derived_key])) {
@@ -660,7 +596,6 @@ class Memcached implements \Stack\ObjectCache
         // Only reset the runtime cache if memcached was properly flushed
         if (\Memcached::RES_SUCCESS === $this->getResultCode()) {
             $this->cache = array();
-            $this->preload = array();
         }
 
         return $result;
@@ -744,9 +679,8 @@ class Memcached implements \Stack\ObjectCache
         }
 
         if (\Memcached::RES_SUCCESS === $this->getResultCode()) {
-            if ($group != 'object-cache-preload' && isset($value) && !in_array($group, $this->no_mc_groups)) {
+            if (isset($value) && !in_array($group, $this->no_mc_groups)) {
                     $this->add_to_internal_cache($derived_key, $value);
-                    $this->preload[$derived_key] = true;
             }
 
             $found = true;
