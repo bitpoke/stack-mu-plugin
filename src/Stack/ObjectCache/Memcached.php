@@ -94,7 +94,7 @@ class Memcached implements \Stack\ObjectCache
             define('WP_CACHE_KEY_SALT', '1');
         }
 
-        $this->preloadEnabled = !defined('OBJECT_CACHE_PRELOAD') || !OBJECT_CACHE_PRELOAD;
+        $this->preloadEnabled = defined('OBJECT_CACHE_PRELOAD') && OBJECT_CACHE_PRELOAD;
 
         $server = explode(':', constant('MEMCACHED_HOST'));
         if (count($server) == 1) {
