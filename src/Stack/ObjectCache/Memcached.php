@@ -45,7 +45,7 @@ class Memcached implements \Stack\ObjectCache
      *
      * @var array
      */
-    public $no_mc_groups = array('comment', 'counts');
+    public $no_mc_groups = array();
 
     /**
      * Prefix used for global groups.
