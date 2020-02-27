@@ -7,3 +7,5 @@
 \Tests_Privacy_WpPrivacyDeleteOldExportFiles
 \Tests_Privacy_WpPrivacyGeneratePersonalDataExportFile
 \Tests_Basic::test_license
+\Tests_DB::test_get_col
+\Tests_DB::test_empty_where_on_update
