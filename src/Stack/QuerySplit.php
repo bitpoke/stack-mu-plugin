@@ -16,14 +16,14 @@ namespace Stack;
 class QuerySplit
 {
 
-    const MASTER_LABEL = "/*master*/";
-    const SLAVE_LABEL = "/*slave*/";
+    const MASTER_LABEL = "/*route:master*/";
+    const SLAVE_LABEL = "/*route:slave*/";
 
     private $srtm = false;
 
     public function __construct()
     {
-        $this->presetup();
+        $this->setup();
         $this->addFilters();
     }
 
@@ -48,7 +48,7 @@ class QuerySplit
         return $query;
     }
 
-    private function presetup()
+    private function setup()
     {
         // Send non-idempotent requests to master
         if (! in_array($_SERVER['REQUEST_METHOD'], array( 'GET', 'HEAD' ))) {
