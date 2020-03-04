@@ -27,16 +27,26 @@ class QuerySplit
         $this->addFilters();
     }
 
+    public function __destruct()
+    {
+        $this->removeFilters();
+    }
+
     private function addFilters()
     {
         add_filter('query', [$this, 'processQuery']);
+    }
+
+    private function removeFilters()
+    {
+        remove_filter('query', [$this, 'processQuery']);
     }
 
     public function processQuery(string $query)
     {
         // don't need to analize the query if it's already write
         // NOTE: this can be optimized to send reads on master per table
-        if (! $this->srtm === true) {
+        if (!$this->srtm) {
             $this->analizeQuery($query);
         }
 
@@ -61,9 +71,6 @@ class QuerySplit
             $this->sendReadsToMaster();
             return;
         }
-
-        // TODO(@calind): why not sending to master all queries that are made from URI that starts with SITE_URL?
-        // admin-ajax.php uses master, is this intended behavior?
 
         // Admin requests always go to master
         if ('/wp/wp-admin/' == substr($_SERVER['REQUEST_URI'], 0, 13)) {
@@ -105,6 +112,6 @@ class QuerySplit
         // Quick and dirty: only SELECT statements are considered read-only.
         $q = ltrim($q, "\r\n\t (");
 
-        return ! preg_match('/^(?:SELECT|SHOW|DESCRIBE|DESC|EXPLAIN)\s/i', $q);
+        return ! preg_match('/^(?:SELECT(?!.*FOR UPDATE)|SHOW|DESCRIBE|DESC|EXPLAIN)\s/i', $q);
     }
 }
