@@ -25,7 +25,8 @@
         "oscarotero/env": "^1.2.0",
         "composer/installers": "~1.9",
         "google/cloud-storage": "^1.21",
-        "google/auth": "^1.9.0"
+        "google/auth": "^1.9.0",
+        "endclothing/prometheus_client_php": "^1.0"
     },
     "config": {
         "optimize-autoloader": true
