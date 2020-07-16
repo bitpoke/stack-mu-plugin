@@ -15,7 +15,7 @@ ARGS ?=
 
 .PHONY: lint
 lint:
-	$(PHPCS)
+	$(PHPCS) --ignore=$(PWD)/src/Stack/NginxHelper/*
 
 .PHONY: dependencies
 dependencies:

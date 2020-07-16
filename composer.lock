@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c567a92803ed49edd002140a5c8d1fbd",
+    "content-hash": "27dcc6e97603067466477cd98c739151",
     "packages": [
         {
             "name": "composer/installers",
@@ -1013,52 +1013,6 @@
                 "uri"
             ],
             "time": "2017-06-14T03:57:53+00:00"
-        },
-        {
-            "name": "rtcamp/nginx-helper",
-            "version": "dev-memcached-support",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/presslabs/nginx-helper",
-                "reference": "c4f79dd34587e7e6e7a2a4298b0d16bc743efd2f"
-            },
-            "require": {
-                "composer/installers": "^1.0",
-                "php": ">=5.3.2"
-            },
-            "require-dev": {
-                "wpreadme2markdown/wpreadme2markdown": "*"
-            },
-            "type": "wordpress-plugin",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "rtCamp",
-                    "email": "support@rtcamp.com",
-                    "homepage": "https://rtcamp.com"
-                }
-            ],
-            "description": "Cleans nginx's fastcgi/proxy cache or redis-cache whenever a post is edited/published. Also does a few more things.",
-            "homepage": "https://rtcamp.com/nginx-helper/",
-            "keywords": [
-                "cache",
-                "fastcgi",
-                "nginx",
-                "nginx-helper",
-                "plugin",
-                "redis",
-                "redis-cache",
-                "wordpress"
-            ],
-            "support": {
-                "issues": "https://github.com/rtCamp/nginx-helper/issues",
-                "forum": "https://wordpress.org/support/plugin/nginx-helper",
-                "wiki": "https://github.com/rtCamp/nginx-helper/wiki",
-                "source": "https://github.com/rtCamp/nginx-helper/"
-            },
-            "time": "2020-07-16T10:23:37+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -3556,7 +3510,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "rtcamp/nginx-helper": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
