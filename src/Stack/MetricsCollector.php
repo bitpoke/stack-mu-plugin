@@ -7,10 +7,10 @@ class MetricsRegistry
     {
         $storage = new \Prometheus\Storage\APC();
         $this->registry = new \Prometheus\CollectorRegistry($storage);
-        $this->register_metrics($metrics);
+        $this->registerMetrics($metrics);
     }
 
-    public function register_metrics($metrics = [])
+    public function registerMetrics($metrics = [])
     {
         foreach ($metrics as $metric => [$kind, $description, $labels]) {
             [$namespace, $name] = explode('.', $metric);
@@ -46,17 +46,17 @@ class MetricsRegistry
         }
     }
 
-    public function get_gauge($metric)
+    public function getGauge($metric)
     {
         return $this->metrics[$metric];
     }
 
-    public function get_counter($metric)
+    public function getCounter($metric)
     {
         return $this->metrics[$metric];
     }
 
-    public function get_histogram($metric)
+    public function getHistogram($metric)
     {
         return $this->metrics[$metric];
     }
@@ -79,7 +79,7 @@ class MetricsCollector
 
     private $registry;
     private $metrics;
-    private $wpdb_stats;
+    private $wpdbStats;
 
     public function __construct()
     {
@@ -97,39 +97,39 @@ class MetricsCollector
             )
         );
 
-        $this->register_hooks();
-        $this->init_wpdb_stats();
+        $this->registerHooks();
+        $this->initWpdbStats();
     }
 
 
-    public function init_wpdb_stats()
+    public function initWpdbStats()
     {
-        $this->wpdb_stats['slow_query_treshold'] = defined('SLOW_QUERY_THRESHOLD') ? SLOW_QUERY_THRESHOLD : 2000;
-        $this->wpdb_stats['query_time'] = 0;
-        $this->wpdb_stats['num_queries'] = 0;
-        $this->wpdb_stats['num_slow_queries'] = 0;
+        $this->wpdbStats['slow_query_treshold'] = defined('SLOW_QUERY_THRESHOLD') ? SLOW_QUERY_THRESHOLD : 2000;
+        $this->wpdbStats['query_time'] = 0;
+        $this->wpdbStats['num_queries'] = 0;
+        $this->wpdbStats['num_slow_queries'] = 0;
     }
 
-    public function collect_request_metrics()
+    public function collectRequestMetrics()
     {
-        $request_type = $this::_get_request_type();
+        $requestType  = $this::getRequestType();
         $display      = 0;
         $precision    = 12;
         $request_time = timer_stop($display, $precision);
         $peak_memory  = memory_get_peak_usage();
 
-        $this->metrics->get_counter('wp.requests')->incBy(1, [$request_type]);
-        $this->metrics->get_histogram('wp.peak_memory')->observe($peak_memory, [$request_type]);
-        $this->metrics->get_histogram('wp.page_generation_time')->observe($request_time, [$request_type]);
+        $this->metrics->getCounter('wp.requests')->incBy(1, [$requestType]);
+        $this->metrics->getHistogram('wp.peak_memory')->observe($peak_memory, [$requestType]);
+        $this->metrics->getHistogram('wp.page_generation_time')->observe($request_time, [$requestType]);
 
-        if ($this::_do_collect_wpdb_metrics()) {
-            $this->metrics->get_histogram('wpdb.query_time')->observe($this->wpdb_stats['query_time'], [$request_type]);
-            $this->metrics->get_histogram('wpdb.num_queries')->observe($this->wpdb_stats['num_queries'], [$request_type]);
-            $this->metrics->get_histogram('wpdb.num_slow_queries')->observe($this->wpdb_stats['num_slow_queries'], [$request_type]);
+        if ($this::doCollectWpdbMetrics()) {
+            $this->metrics->getHistogram('wpdb.query_time')->observe($this->wpdbStats['query_time'], [$requestType]);
+            $this->metrics->getHistogram('wpdb.num_queries')->observe($this->wpdbStats['num_queries'], [$requestType]);
+            $this->metrics->getHistogram('wpdb.num_slow_queries')->observe($this->wpdbStats['num_slow_queries'], [$requestType]);
         }
     }
 
-    public function register_endpoint()
+    public function registerEndpoint()
     {
         $version   = '1';
         $namespace = 'stack/v' . $version;
@@ -143,61 +143,61 @@ class MetricsCollector
         ));
     }
 
-    public function collect_wpdb_stats($query_data, $query, $query_time, $query_callstack, $query_start)
+    public function collectWpdbStats($queryData, $query, $queryTime, $queryCallstack, $queryStart)
     {
-        if (!$this::_do_collect_wpdb_metrics()) {
+        if (!$this::doCollectWpdbMetrics()) {
             return;
         }
 
-        $query_duration = $query_time - $query_start;
-        $this->wpdb_stats['num_queries'] += 1;
-        $this->wpdb_stats['query_time'] += $query_time;
+        $query_duration = $queryTime - $queryStart;
+        $this->wpdbStats['num_queries'] += 1;
+        $this->wpdbStats['query_time'] += $queryTime;
 
-        if ($query_time > $this->wpdb_stats['slow_query_treshold']) {
-            $this->wpdb_stats['num_slow_queries'] += 1;
+        if ($queryTime > $this->wpdbStats['slow_query_treshold']) {
+            $this->wpdbStats['num_slow_queries'] += 1;
         }
 
-        return $query_data;
+        return $queryData;
     }
 
-    public function track_woocomerce_order($order_id, $old_status, $new_status)
+    public function trackWoocomerceOrder($order_id, $old_status, $new_status)
     {
         if ($new_status == 'completed') {
             $this->metrics['woocommerce.orders']->inc();
         }
     }
 
-    public function track_woocomerce_checkout()
+    public function trackWoocomerceCheckout()
     {
         $this->metrics['woocommerce.checkouts']->inc();
     }
 
-    private function register_hooks()
+    private function registerHooks()
     {
-        add_action('rest_api_init', [$this, 'register_endpoint']);
-        add_action('shutdown', [$this, 'collect_request_metrics']);
+        add_action('rest_api_init', [$this, 'registerEndpoint']);
+        add_action('shutdown', [$this, 'collectRequestMetrics']);
 
-        if ($this::_do_collect_wpdb_metrics()) {
-            add_filter('log_query_custom_data', [$this, 'collect_wpdb_stats'], 10, 5);
+        if ($this::doCollectWpdbMetrics()) {
+            add_filter('log_query_custom_data', [$this, 'collectWpdbStats'], 10, 5);
         }
 
-        if ($this::_do_collect_woocommerce_metrics()) {
-            add_action('woocommerce_checkout_billing', [$this, 'track_woocomerce_checkout']);
-            add_action('woocommerce_order_status_changed', [$this, 'track_woocomerce_order'], 10, 3);
+        if ($this::doCollectWoocommerceMetrics()) {
+            add_action('woocommerce_checkout_billing', [$this, 'trackWoocomerceCheckout']);
+            add_action('woocommerce_order_status_changed', [$this, 'trackWoocomerceOrder'], 10, 3);
         }
     }
 
-    private function _do_collect_wpdb_metrics()
+    private function doCollectWpdbMetrics()
     {
-        return isset($this->wpdb_stats);
+        return isset($this->wpdbStats);
     }
 
-    private function _do_collect_woocommerce_metrics()
+    private function doCollectWoocommerceMetrics()
     {
         return function_exists('is_woocommerce') && is_woocommerce();
     }
 
-    private function _get_request_type()
+    private function getRequestType()
     {
         if (defined('DOING_CRON') && DOING_CRON) {
             return 'cron';
