@@ -84,7 +84,7 @@ class MetricsCollector
         $this->metrics->getHistogram('wp.peak_memory')->observe($peak_memory, [$requestType]);
         $this->metrics->getHistogram('wp.page_generation_time')->observe($request_time, [$requestType]);
 
-        if ($this::doCollectWpdbMetrics()) {
+        if ($this::canCollectWpdbMetrics()) {
             $this->metrics->getHistogram('wpdb.query_time')->observe(
                 $this->wpdbStats['query_time'],
                 [$requestType]
@@ -116,7 +116,7 @@ class MetricsCollector
 
     public function collectWpdbStats($queryData, $query, $queryTime, $queryCallstack, $queryStart)
     {
-        if (!$this::doCollectWpdbMetrics()) {
+        if (!$this::canCollectWpdbMetrics()) {
             return;
         }
 
@@ -148,22 +148,22 @@ class MetricsCollector
         add_action('rest_api_init', [$this, 'registerEndpoint']);
         add_action('shutdown', [$this, 'collectRequestMetrics']);
 
-        if ($this::doCollectWpdbMetrics()) {
+        if ($this::canCollectWpdbMetrics()) {
             add_filter('log_query_custom_data', [$this, 'collectWpdbStats'], 10, 5);
         }
 
-        if ($this::doCollectWoocommerceMetrics()) {
+        if ($this::canCollectWoocommerceMetrics()) {
             add_action('woocommerce_checkout_billing', [$this, 'trackWoocomerceCheckout']);
             add_action('woocommerce_order_status_changed', [$this, 'trackWoocomerceOrder'], 10, 3);
         }
     }
 
-    private function doCollectWpdbMetrics()
+    private function canCollectWpdbMetrics()
     {
         return defined('SAVEQUERIES') && SAVEQUERIES
     }
 
-    private function doCollectWoocommerceMetrics()
+    private function canCollectWoocommerceMetrics()
     {
         return function_exists('is_woocommerce') && is_woocommerce();
     }
