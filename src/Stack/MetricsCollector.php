@@ -189,7 +189,7 @@ class MetricsCollector
 
     private function doCollectWpdbMetrics()
     {
-        return isset($this->wpdbStats);
+        return defined('SAVEQUERIES') && SAVEQUERIES
     }
 
     private function doCollectWoocommerceMetrics()
