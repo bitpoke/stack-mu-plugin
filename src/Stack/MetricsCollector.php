@@ -1,81 +1,11 @@
 <?php
 namespace Stack;
 
-class MetricsRegistry
-{
-    public function __construct($metrics = [])
-    {
-        $storage = new \Prometheus\Storage\APC();
-        $this->registry = new \Prometheus\CollectorRegistry($storage);
-        $this->registerMetrics($metrics);
-    }
-
-    public function registerMetrics($metrics = [])
-    {
-        foreach ($metrics as $metric => [$kind, $description, $labels]) {
-            [$namespace, $name] = explode('.', $metric);
-
-            switch ($kind) {
-                case 'histogram':
-                    $this->metrics[$metric] = $this->registry->registerHistogram(
-                        $namespace,
-                        $name,
-                        $description,
-                        $labels
-                    );
-                    break;
-
-                case 'counter':
-                    $this->metrics[$metric] = $this->registry->registerCounter(
-                        $namespace,
-                        $name,
-                        $description,
-                        $labels
-                    );
-                    break;
-
-                case 'gauge':
-                    $this->metrics[$metric] = $this->registry->registerGauge(
-                        $namespace,
-                        $name,
-                        $description,
-                        $labels
-                    );
-                    break;
-            }
-        }
-    }
-
-    public function getGauge($metric)
-    {
-        return $this->metrics[$metric];
-    }
-
-    public function getCounter($metric)
-    {
-        return $this->metrics[$metric];
-    }
-
-    public function getHistogram($metric)
-    {
-        return $this->metrics[$metric];
-    }
-
-    public function render()
-    {
-        $renderer = new \Prometheus\RenderTextFormat();
-        $result = $renderer->render($this->registry->getMetricFamilySamples());
-
-        header('Content-type: ' . \Prometheus\RenderTextFormat::MIME_TYPE);
-
-        echo $result;
-        exit();
-    }
-}
-
 class MetricsCollector
 {
-    const REQUEST_TYPES = array( 'cron', 'api', 'admin-ajax', 'admin', 'search', 'frontpage', 'singular', 'archive', 'other' );
+    const REQUEST_TYPES = array(
+        'cron', 'api', 'admin-ajax', 'admin', 'search', 'frontpage', 'singular', 'archive', 'other'
+    );
 
     private $registry;
     private $metrics;
@@ -85,22 +15,54 @@ class MetricsCollector
     {
         $this->metrics = new MetricsRegistry(
             array(
-                'wp.requests'              => array('counter',   'Number of requests',                                 ['request_type']),
-                'wp.page_generation_time'  => array('histogram', 'Page generation time, in seconds',                   ['request_type']),
-                'wp.peak_memory'           => array('histogram', 'Peak memory per request, in bytes',                  ['request_type']),
-                'wpdb.query_time'          => array('histogram', 'Total MySQL query time per request, in seconds',     ['request_type']),
-                'wpdb.num_queries'         => array('histogram', 'Total number of MySQL queries per request',          ['request_type']),
-                'wpdb.num_slow_queries'    => array('histogram', 'Number of MySQL slow queries per request',           ['request_type']),
-                'wpdb.slow_query_treshold' => array('gauge',     'The treshold for counting slow queries, in seconds', []),
-                'woocommerce.orders'       => array('counter',   'Number of completed WooCommerce orders',             []),
-                'woocommerce.checkouts'    => array('counter',   'Number of started WooCommerce checkouts',            [])
+                'wp.requests' => array(
+                    'counter',
+                    'Number of requests',
+                    ['request_type']
+                ),
+                'wp.page_generation_time' => array(
+                    'histogram',
+                    'Page generation time, in seconds',
+                    ['request_type']
+                ),
+                'wp.peak_memory' => array(
+                    'histogram',
+                    'Peak memory per request, in bytes',
+                    ['request_type']
+                ),
+                'wpdb.query_time' => array(
+                    'histogram',
+                    'Total MySQL query time per request, in seconds',
+                    ['request_type']
+                ),
+                'wpdb.num_queries' => array(
+                    'histogram',
+                    'Total number of MySQL queries per request',
+                    ['request_type']
+                ),
+                'wpdb.num_slow_queries' => array(
+                    'histogram',
+                    'Number of MySQL slow queries per request',
+                    ['request_type']
+                ),
+                'wpdb.slow_query_treshold' => array(
+                    'gauge',
+                    'The treshold for counting slow queries, in seconds'
+                ),
+                'woocommerce.orders' => array(
+                    'counter',
+                    'Number of completed WooCommerce orders'
+                ),
+                'woocommerce.checkouts' => array(
+                    'counter',
+                    'Number of started WooCommerce checkouts'
+                )
             )
         );
 
         $this->registerHooks();
         $this->initWpdbStats();
     }
-
 
     public function initWpdbStats()
     {
@@ -123,9 +85,18 @@ class MetricsCollector
         $this->metrics->getHistogram('wp.page_generation_time')->observe($request_time, [$requestType]);
 
         if ($this::doCollectWpdbMetrics()) {
-            $this->metrics->getHistogram('wpdb.query_time')->observe($this->wpdbStats['query_time'], [$requestType]);
-            $this->metrics->getHistogram('wpdb.num_queries')->observe($this->wpdbStats['num_queries'], [$requestType]);
-            $this->metrics->getHistogram('wpdb.num_slow_queries')->observe($this->wpdbStats['num_slow_queries'], [$requestType]);
+            $this->metrics->getHistogram('wpdb.query_time')->observe(
+                $this->wpdbStats['query_time'],
+                [$requestType]
+            );
+            $this->metrics->getHistogram('wpdb.num_queries')->observe(
+                $this->wpdbStats['num_queries'],
+                [$requestType]
+            );
+            $this->metrics->getHistogram('wpdb.num_slow_queries')->observe(
+                $this->wpdbStats['num_slow_queries'],
+                [$requestType]
+            );
         }
     }
 
