@@ -160,7 +160,7 @@ class MetricsCollector
 
     private function canCollectWpdbMetrics()
     {
-        return defined('SAVEQUERIES') && SAVEQUERIES
+        return defined('SAVEQUERIES') && SAVEQUERIES;
     }
 
     private function canCollectWoocommerceMetrics()
