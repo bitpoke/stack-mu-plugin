@@ -47,15 +47,18 @@ class MetricsCollector
                 ),
                 'wpdb.slow_query_treshold' => array(
                     'gauge',
-                    'The treshold for counting slow queries, in seconds'
+                    'The treshold for counting slow queries, in seconds',
+                    []
                 ),
                 'woocommerce.orders' => array(
                     'counter',
-                    'Number of completed WooCommerce orders'
+                    'Number of completed WooCommerce orders',
+                    []
                 ),
                 'woocommerce.checkouts' => array(
                     'counter',
-                    'Number of started WooCommerce checkouts'
+                    'Number of started WooCommerce checkouts',
+                    []
                 )
             )
         );
