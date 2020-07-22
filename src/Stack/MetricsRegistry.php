@@ -17,7 +17,7 @@ class MetricsRegistry
 
             switch ($kind) {
                 case 'histogram':
-                    $this->metrics[$metric] = $this->registry->registerHistogram(
+                    $this->metrics[$metric] = $this->registry->getOrRegisterHistogram(
                         $namespace,
                         $name,
                         $description,
@@ -26,7 +26,7 @@ class MetricsRegistry
                     break;
 
                 case 'counter':
-                    $this->metrics[$metric] = $this->registry->registerCounter(
+                    $this->metrics[$metric] = $this->registry->getOrRegisterCounter(
                         $namespace,
                         $name,
                         $description,
@@ -35,7 +35,7 @@ class MetricsRegistry
                     break;
 
                 case 'gauge':
-                    $this->metrics[$metric] = $this->registry->registerGauge(
+                    $this->metrics[$metric] = $this->registry->getOrRegisterGauge(
                         $namespace,
                         $name,
                         $description,
