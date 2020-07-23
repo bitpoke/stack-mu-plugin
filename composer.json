@@ -18,10 +18,6 @@
       {
         "type": "composer",
         "url": "https://wpackagist.org"
-      },
-      {
-        "type": "git",
-        "url": "https://github.com/presslabs/nginx-helper"
       }
     ],
     "require": {
@@ -29,8 +25,7 @@
         "oscarotero/env": "^1.2.0",
         "composer/installers": "~1.9",
         "google/cloud-storage": "^1.21",
-        "google/auth": "^1.9.0",
-        "rtcamp/nginx-helper": "dev-memcached-support"
+        "google/auth": "^1.9.0"
     },
     "config": {
         "optimize-autoloader": true

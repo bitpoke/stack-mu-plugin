@@ -5,4 +5,4 @@ Stack\Config::loadDefaults();
 new Stack\URLFixer();
 new Stack\MediaStorage();
 new Stack\QuerySplit();
-new Stack\CachePluginActivator();
+new Stack\NginxHelperActivator();
