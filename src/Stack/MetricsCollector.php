@@ -3,10 +3,6 @@ namespace Stack;
 
 class MetricsCollector
 {
-    const REQUEST_TYPES = array(
-        'cron', 'api', 'admin-ajax', 'admin', 'search', 'frontpage', 'singular', 'archive', 'other'
-    );
-
     private $registry;
     private $metrics;
     private $wpdbStats;
@@ -81,15 +77,13 @@ class MetricsCollector
 
     public function collectRequestMetrics()
     {
-        $requestType  = $this::getRequestType();
-        $display      = 0;
-        $precision    = 12;
-        $request_time = timer_stop($display, $precision);
-        $peak_memory  = memory_get_peak_usage();
+        $requestType = $this::getRequestType();
+        $requestTime = timer_stop(0, 12);
+        $peakMemory  = memory_get_peak_usage();
 
         $this->metrics->getCounter('wp.requests')->incBy(1, [$requestType]);
-        $this->metrics->getHistogram('wp.peak_memory')->observe($peak_memory, [$requestType]);
-        $this->metrics->getHistogram('wp.page_generation_time')->observe($request_time, [$requestType]);
+        $this->metrics->getHistogram('wp.peak_memory')->observe($peakMemory, [$requestType]);
+        $this->metrics->getHistogram('wp.page_generation_time')->observe($requestTime, [$requestType]);
 
         if ($this::canCollectWpdbMetrics()) {
             $this->metrics->getHistogram('wpdb.query_time')->observe(
@@ -126,7 +120,6 @@ class MetricsCollector
             return;
         }
 
-        $query_duration = $queryTime - $queryStart;
         $this->wpdbStats['num_queries'] += 1;
         $this->wpdbStats['query_time'] += $queryTime;
 
@@ -137,7 +130,7 @@ class MetricsCollector
         return $queryData;
     }
 
-    public function trackWoocomerceOrder($order_id, $old_status, $new_status)
+    public function trackWoocomerceOrder($orderId, $oldStatus, $newStatus)
     {
         if ($new_status == 'completed') {
             $this->metrics['woocommerce.orders']->inc();
