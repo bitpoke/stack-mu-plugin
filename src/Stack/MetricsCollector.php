@@ -108,9 +108,8 @@ class MetricsCollector
     }
 
     public function registerEndpoint()
-    {
-        $version   = '1';
-        $namespace = 'stack/v' . $version;
+    {;
+        $namespace = 'stack/v' . STACK_REST_API_VERSION;
         $base      = 'metrics';
 
         register_rest_route($namespace, '/' . $base, array(

@@ -63,6 +63,8 @@ class Config
         self::definePath("GIT_KEY_FILE", "/var/run/secrets/presslabs.org/instance/id_rsa");
         self::definePath("GIT_KEY_FILE", (rtrim(env("HOME"), '/') ?: "/var/www") . "/.ssh/id_rsa");
 
+        self::define('STACK_REST_API_VERSION', '1');
+
         $runCount++;
     }
 
