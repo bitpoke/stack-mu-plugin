@@ -102,7 +102,7 @@ class MetricsCollector
     }
 
     public function registerEndpoint()
-    {;
+    {
         $namespace = 'stack/v' . STACK_REST_API_VERSION;
         $base      = 'metrics';
 
