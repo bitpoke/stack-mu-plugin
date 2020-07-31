@@ -78,23 +78,6 @@ class Nginx_Helper_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
 
-		/**
-		 * Define settings tabs
-		 */
-		$this->settings_tabs = apply_filters(
-			'rt_nginx_helper_settings_tabs',
-			array(
-				'general' => array(
-					'menu_title' => __( 'General', 'nginx-helper' ),
-					'menu_slug'  => 'general',
-				),
-				'support' => array(
-					'menu_title' => __( 'Support', 'nginx-helper' ),
-					'menu_slug'  => 'support',
-				),
-			)
-		);
-
 		$this->options = $this->nginx_helper_settings();
 
 	}
@@ -174,8 +157,8 @@ class Nginx_Helper_Admin {
 
 			add_submenu_page(
 				'settings.php',
-				__( 'Nginx Helper', 'nginx-helper' ),
-				__( 'Nginx Helper', 'nginx-helper' ),
+				__( 'Page Caching', 'nginx-helper' ),
+				__( 'Page Caching', 'nginx-helper' ),
 				'manage_options',
 				'nginx',
 				array( &$this, 'nginx_helper_setting_page' )
@@ -185,8 +168,8 @@ class Nginx_Helper_Admin {
 
 			add_submenu_page(
 				'options-general.php',
-				__( 'Nginx Helper', 'nginx-helper' ),
-				__( 'Nginx Helper', 'nginx-helper' ),
+				__( 'Page Caching', 'nginx-helper' ),
+				__( 'Page Caching', 'nginx-helper' ),
 				'manage_options',
 				'nginx',
 				array( &$this, 'nginx_helper_setting_page' )
@@ -255,13 +238,13 @@ class Nginx_Helper_Admin {
 	public function nginx_helper_default_settings() {
 
 		return array(
-			'enable_purge'                     => 0,
+			'enable_purge'                     => 1,
 			'cache_method'                     => 'enable_fastcgi',
+			'hide_cache_method'                => 0,
 			'purge_method'                     => 'get_request',
 			'enable_map'                       => 0,
 			'enable_log'                       => 0,
 			'log_level'                        => 'INFO',
-			'log_filesize'                     => '5',
 			'enable_stamp'                     => 0,
 			'purge_homepage_on_edit'           => 1,
 			'purge_homepage_on_del'            => 1,
@@ -321,7 +304,6 @@ class Nginx_Helper_Admin {
 
 		if ( $is_redis_enabled ) {
 			$data['redis_enabled_by_constant'] = $is_redis_enabled;
-			$data['enable_purge']              = $is_redis_enabled;
 			$data['cache_method']              = 'enable_redis';
 			$data['redis_hostname']            = RT_WP_NGINX_HELPER_REDIS_HOSTNAME;
 			$data['redis_port']                = RT_WP_NGINX_HELPER_REDIS_PORT;
@@ -337,12 +319,15 @@ class Nginx_Helper_Admin {
 
 		if ( $is_memcached_enabled ) {
 			$data['memcached_enabled_by_constant'] = $is_memcached_enabled;
-			$data['enable_purge']                  = $is_memcached_enabled;
 			$data['cache_method']                  = 'enable_memcached';
 			$data['memcached_hostname']            = RT_WP_NGINX_HELPER_MEMCACHED_HOSTNAME;
 			$data['memcached_port']                = RT_WP_NGINX_HELPER_MEMCACHED_PORT;
 			$data['memcached_prefix']              = RT_WP_NGINX_HELPER_MEMCACHED_PREFIX;
 			$data['memcached_versioned_cache_key'] = RT_WP_NGINX_HELPER_MEMCACHED_VERSIONED_CACHE_KEY;
+		}
+
+		if( $is_memcached_enabled || $is_memcached_enabled ) {
+		    $data['hide_cache_method'] = 1;
 		}
 
 		return $data;
@@ -382,6 +367,21 @@ class Nginx_Helper_Admin {
 		$log_path = WP_CONTENT_DIR . '/uploads/nginx-helper/';
 
 		return apply_filters( 'nginx_asset_path', $log_path );
+
+	}
+
+	/**
+	 * Retrieve the log path.
+	 *
+	 * @since     2.0.0
+	 * @return    string    asset path of the plugin.
+	 */
+	public function functional_log_path() {
+
+        // write to Docker's stderr
+		$log_path = 'php://stderr';
+
+		return apply_filters( 'nginx_log_path', $log_path );
 
 	}
 
