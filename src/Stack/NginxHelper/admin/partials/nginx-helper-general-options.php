@@ -12,8 +12,6 @@
 
 global $nginx_helper_admin;
 
-$error_log_filesize = false;
-
 $args = array(
 	'enable_purge'                     => FILTER_SANITIZE_STRING,
 	'enable_stamp'                     => FILTER_SANITIZE_STRING,
@@ -30,7 +28,6 @@ $args = array(
 	'purge_homepage_on_del'            => FILTER_SANITIZE_STRING,
 	'purge_url'                        => FILTER_SANITIZE_STRING,
 	'log_level'                        => FILTER_SANITIZE_STRING,
-	'log_filesize'                     => FILTER_SANITIZE_STRING,
 	'smart_http_expire_save'           => FILTER_SANITIZE_STRING,
 	'cache_method'                     => FILTER_SANITIZE_STRING,
 	'enable_map'                       => FILTER_SANITIZE_STRING,
@@ -56,11 +53,6 @@ if ( isset( $all_inputs['smart_http_expire_save'] ) && wp_verify_nonce( $all_inp
 		$nginx_helper_admin->nginx_helper_default_settings()
 	);
 
-	if ( ( ! is_numeric( $nginx_settings['log_filesize'] ) ) || ( empty( $nginx_settings['log_filesize'] ) ) ) {
-		$error_log_filesize = __( 'Log file size must be a number.', 'nginx-helper' );
-		unset( $nginx_settings['log_filesize'] );
-	}
-
 	if ( $nginx_settings['enable_map'] ) {
 		$nginx_helper_admin->update_map();
 	}
@@ -72,8 +64,8 @@ if ( isset( $all_inputs['smart_http_expire_save'] ) && wp_verify_nonce( $all_inp
 }
 
 $nginx_helper_settings = $nginx_helper_admin->nginx_helper_settings();
-$log_path              = $nginx_helper_admin->functional_asset_path();
-$log_url               = $nginx_helper_admin->functional_asset_url();
+$asset_path            = $nginx_helper_admin->functional_asset_path();
+$log_path              = $nginx_helper_admin->functional_log_path();
 
 /**
  * Get setting url for single multiple with subdomain OR multiple with subdirectory site.
@@ -109,7 +101,7 @@ if ( is_multisite() ) {
 	</div>
 
 	<?php if ( ! ( ! is_network_admin() && is_multisite() ) ) { ?>
-		<div class="postbox enable_purge"<?php echo ( empty( $nginx_helper_settings['enable_purge'] ) ) ? ' style="display: none;"' : ''; ?>>
+		<div class="postbox enable_purge <?php echo ( $nginx_helper_settings['hide_cache_method'] ) ? 'hidden' : ''; ?>"<?php echo ( empty( $nginx_helper_settings['enable_purge'] ) || $nginx_helper_settings['hide_cache_method'] ) ? ' style="display: none;"' : ''; ?>>
 			<h3 class="hndle">
 				<span><?php esc_html_e( 'Caching Method', 'nginx-helper' ); ?></span>
 			</h3>
@@ -151,7 +143,7 @@ if ( is_multisite() ) {
 				</table>
 			</div> <!-- End of .inside -->
 		</div>
-		<div class="enable_purge">
+		<div class="enable_purge <?php echo ( $nginx_helper_settings['hide_cache_method'] ) ? 'hidden' : ''; ?>"<?php echo ( empty( $nginx_helper_settings['enable_purge'] ) || $nginx_helper_settings['hide_cache_method'] ) ? ' style="display: none;"' : ''; ?>>
 			<div class="postbox cache_method_fastcgi"  <?php echo ( ! empty( $nginx_helper_settings['enable_purge'] ) && 'enable_fastcgi' === $nginx_helper_settings['cache_method'] ) ? '' : 'style="display: none;"'; ?> >
 				<h3 class="hndle">
 					<span><?php esc_html_e( 'Purge Method', 'nginx-helper' ); ?></span>
@@ -653,7 +645,7 @@ if ( is_multisite() ) {
 			</h3>
 			<div class="inside">
 			<?php
-			if ( ! is_writable( $log_path . 'map.conf' ) ) {
+			if ( ! is_writable( $asset_path . 'map.conf' ) ) {
 				?>
 					<span class="error fade" style="display: block">
 						<p>
@@ -664,7 +656,7 @@ if ( is_multisite() ) {
 									sprintf(
 										// translators: %s file url.
 										__( 'Check you have write permission on <strong>%s</strong>', 'nginx-helper' ),
-										esc_url( $log_path . 'map.conf' )
+										esc_url( $asset_path . 'map.conf' )
 									),
 									array( 'strong' => array() )
 								);
@@ -686,7 +678,7 @@ if ( is_multisite() ) {
 						?>
 						</th>
 						<td>
-							<pre><?php echo esc_url( $log_path . 'map.conf' ); ?></pre>
+							<pre><?php echo esc_url( $asset_path . 'map.conf' ); ?></pre>
 						</td>
 					</tr>
 					<tr>
@@ -717,36 +709,6 @@ if ( is_multisite() ) {
 			<span><?php esc_html_e( 'Logging Options', 'nginx-helper' ); ?></span>
 		</h3>
 		<div class="inside">
-			<?php
-			if ( ! is_dir( $log_path ) ) {
-				mkdir( $log_path );
-			}
-			if ( ! file_exists( $log_path . 'nginx.log' ) ) {
-				$log = fopen( $log_path . 'nginx.log', 'w' );
-				fclose( $log );
-			}
-			if ( ! is_writable( $log_path . 'nginx.log' ) ) {
-				?>
-				<span class="error fade" style="display : block">
-					<p>
-					<?php
-					esc_html_e( 'Can\'t write on log file.', 'nginx-helper' );
-					echo '<br /><br />';
-					echo wp_kses(
-						sprintf(
-							// translators: %s file url.
-							__( 'Check you have write permission on <strong>%s</strong>', 'nginx-helper' ),
-							esc_url( $log_path . 'nginx.log' )
-						),
-						array( 'strong' => array() )
-					);
-					?>
-					</p>
-				</span>
-				<?php
-			}
-			?>
-
 			<table class="form-table rtnginx-table">
 				<tbody>
 					<tr>
@@ -757,20 +719,8 @@ if ( is_multisite() ) {
 						</th>
 						<td>
 							<code>
-								<?php echo esc_url( $log_path . 'nginx.log' ); ?>
+								<?php echo esc_url( $log_path, array_merge( wp_allowed_protocols(), array( 'php' ) ) ); ?>
 							</code>
-						</td>
-					</tr>
-					<tr>
-						<th>
-							<label for="rt_wp_nginx_helper_logs_link">
-								<?php esc_html_e( 'View Log', 'nginx-helper' ); ?>
-							</label>
-						</th>
-						<td>
-							<a target="_blank" href="<?php echo esc_url( $log_url . 'nginx.log' ); ?>">
-								<?php esc_html_e( 'Log', 'nginx-helper' ); ?>
-							</a>
 						</td>
 					</tr>
 					<tr>
@@ -786,26 +736,6 @@ if ( is_multisite() ) {
 								<option value="WARNING" <?php selected( $nginx_helper_settings['log_level'], 'WARNING' ); ?>> <?php esc_html_e( 'Warning', 'nginx-helper' ); ?> </option>
 								<option value="ERROR" <?php selected( $nginx_helper_settings['log_level'], 'ERROR' ); ?>> <?php esc_html_e( 'Error', 'nginx-helper' ); ?> </option>
 							</select>
-						</td>
-					</tr>
-					<tr>
-						<th>
-							<label for="log_filesize">
-								<?php esc_html_e( 'Max log file size', 'nginx-helper' ); ?>
-							</label>
-						</th>
-						<td>
-							<input id="log_filesize" class="small-text" type="text" name="log_filesize" value="<?php echo esc_attr( $nginx_helper_settings['log_filesize'] ); ?>" />
-							<?php
-								esc_html_e( 'Mb', 'nginx-helper' );
-							if ( $error_log_filesize ) {
-								?>
-								<p class="error fade" style="display: block;">
-								<?php echo esc_html( $error_log_filesize ); ?>
-								</p>
-								<?php
-							}
-							?>
 						</td>
 					</tr>
 				</tbody>
