@@ -9,6 +9,10 @@ class MetricsCollector
 
     public function __construct()
     {
+        if (!defined('STACK_METRICS_ENABLED') || !STACK_METRICS_ENABLED) {
+            return;
+        }
+
         if (defined('WP_CLI') && WP_CLI) {
             return;
         }
