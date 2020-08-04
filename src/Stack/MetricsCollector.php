@@ -87,9 +87,18 @@ class MetricsCollector
         $requestTime = timer_stop(0, 12);
         $peakMemory  = memory_get_peak_usage();
 
-        $this->metrics->getCounter('wp.requests')->incBy(1, [$hostName, $siteName, $requestType]);
-        $this->metrics->getHistogram('wp.peak_memory')->observe($peakMemory, [$hostName, $siteName, $requestType]);
-        $this->metrics->getHistogram('wp.page_generation_time')->observe($requestTime, [$hostName, $siteName, $requestType]);
+        $this->metrics->getCounter('wp.requests')->incBy(
+            1,
+            [$hostName, $siteName, $requestType]
+        );
+        $this->metrics->getHistogram('wp.peak_memory')->observe(
+            $peakMemory,
+            [$hostName, $siteName, $requestType]
+        );
+        $this->metrics->getHistogram('wp.page_generation_time')->observe(
+            $requestTime,
+            [$hostName, $siteName, $requestType]
+        );
 
         if ($this::canCollectWpdbMetrics()) {
             $this->metrics->getHistogram('wpdb.query_time')->observe(
@@ -185,7 +194,7 @@ class MetricsCollector
 
     private function getSiteName()
     {
-        return defined('STACK_SITE_NAME') ? STACK_SITE_NAME : ""
+        return defined('STACK_SITE_NAME') ? STACK_SITE_NAME : "";
     }
 
     private function getRequestType()
