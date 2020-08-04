@@ -22,47 +22,47 @@ class MetricsCollector
                 'wp.requests' => array(
                     'counter',
                     'Number of requests',
-                    ['host_name', 'site_name', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wp.page_generation_time' => array(
                     'histogram',
                     'Page generation time, in seconds',
-                    ['host_name', 'site_name', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wp.peak_memory' => array(
                     'histogram',
                     'Peak memory per request, in bytes',
-                    ['host_name', 'site_name', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.query_time' => array(
                     'histogram',
                     'Total MySQL query time per request, in seconds',
-                    ['host_name', 'site_name', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.num_queries' => array(
                     'histogram',
                     'Total number of MySQL queries per request',
-                    ['host_name', 'site_name', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.num_slow_queries' => array(
                     'histogram',
                     'Number of MySQL slow queries per request',
-                    ['host_name', 'site_name', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.slow_query_treshold' => array(
                     'gauge',
                     'The treshold for counting slow queries, in seconds',
-                    ['host_name', 'site_name']
+                    ['host', 'site_name']
                 ),
                 'woocommerce.orders' => array(
                     'counter',
                     'Number of completed WooCommerce orders',
-                    ['host_name', 'site_name']
+                    ['host', 'site_name']
                 ),
                 'woocommerce.checkouts' => array(
                     'counter',
                     'Number of started WooCommerce checkouts',
-                    ['host_name', 'site_name']
+                    ['host', 'site_name']
                 )
             )
         );
