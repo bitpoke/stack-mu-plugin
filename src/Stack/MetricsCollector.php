@@ -22,47 +22,47 @@ class MetricsCollector
                 'wp.requests' => array(
                     'counter',
                     'Number of requests',
-                    ['host', 'site_name', 'domain', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wp.page_generation_time' => array(
                     'histogram',
                     'Page generation time, in seconds',
-                    ['host', 'site_name', 'domain', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wp.peak_memory' => array(
                     'histogram',
                     'Peak memory per request, in bytes',
-                    ['host', 'site_name', 'domain', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.query_time' => array(
                     'histogram',
                     'Total MySQL query time per request, in seconds',
-                    ['host', 'site_name', 'domain', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.num_queries' => array(
                     'histogram',
                     'Total number of MySQL queries per request',
-                    ['host', 'site_name', 'domain', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.num_slow_queries' => array(
                     'histogram',
                     'Number of MySQL slow queries per request',
-                    ['host', 'site_name', 'domain', 'request_type']
+                    ['host', 'site_name', 'request_type']
                 ),
                 'wpdb.slow_query_treshold' => array(
                     'gauge',
                     'The treshold for counting slow queries, in seconds',
-                    ['host', 'site_name', 'domain']
+                    ['host', 'site_name']
                 ),
                 'woocommerce.orders' => array(
                     'counter',
                     'Number of completed WooCommerce orders',
-                    ['host', 'site_name', 'domain']
+                    ['host', 'site_name']
                 ),
                 'woocommerce.checkouts' => array(
                     'counter',
                     'Number of started WooCommerce checkouts',
-                    ['host', 'site_name', 'domain']
+                    ['host', 'site_name']
                 )
             )
         );
@@ -84,39 +84,38 @@ class MetricsCollector
         $requestType = $this::getRequestType();
         $siteName = $this::getSiteName();
         $hostName = gethostname();
-        $domain = $_SERVER['HTTP_HOST'];
         $requestTime = timer_stop(0, 12);
         $peakMemory  = memory_get_peak_usage();
 
         $this->metrics->getCounter('wp.requests')->incBy(
             1,
-            [$hostName, $siteName, $domain, $requestType]
+            [$hostName, $siteName, $requestType]
         );
         $this->metrics->getHistogram('wp.peak_memory')->observe(
             $peakMemory,
-            [$hostName, $siteName, $domain, $requestType]
+            [$hostName, $siteName, $requestType]
         );
         $this->metrics->getHistogram('wp.page_generation_time')->observe(
             $requestTime,
-            [$hostName, $siteName, $domain, $requestType]
+            [$hostName, $siteName, $requestType]
         );
 
         if ($this::canCollectWpdbMetrics()) {
             $this->metrics->getHistogram('wpdb.query_time')->observe(
                 $this->wpdbStats['query_time'],
-                [$hostName, $siteName, $domain, $requestType]
+                [$hostName, $siteName, $requestType]
             );
             $this->metrics->getHistogram('wpdb.num_queries')->observe(
                 $this->wpdbStats['num_queries'],
-                [$hostName, $siteName, $domain, $requestType]
+                [$hostName, $siteName, $requestType]
             );
             $this->metrics->getHistogram('wpdb.num_slow_queries')->observe(
                 $this->wpdbStats['num_slow_queries'],
-                [$hostName, $siteName, $domain, $requestType]
+                [$hostName, $siteName, $requestType]
             );
             $this->metrics->getGauge('wpdb.slow_query_treshold')->set(
                 $this->wpdbStats['slow_query_treshold'],
-                [$hostName, $siteName, $domain]
+                [$hostName, $siteName]
             );
         }
     }
@@ -154,10 +153,9 @@ class MetricsCollector
     {
         $siteName = $this::getSiteName();
         $hostName = gethostname();
-        $domain = $_SERVER['HTTP_HOST'];
 
         if ($newStatus == 'completed') {
-            $this->metrics['woocommerce.orders']->incBy(1, [$hostName, $siteName, $domain]);
+            $this->metrics['woocommerce.orders']->incBy(1, [$hostName, $siteName]);
         }
     }
 
@@ -165,9 +163,8 @@ class MetricsCollector
     {
         $siteName = $this::getSiteName();
         $hostName = gethostname();
-        $domain = $_SERVER['HTTP_HOST'];
 
-        $this->metrics['woocommerce.checkouts']->incBy(1, [$hostName, $siteName, $domain]);
+        $this->metrics['woocommerce.checkouts']->incBy(1, [$hostName, $siteName]);
     }
 
     private function registerHooks()
