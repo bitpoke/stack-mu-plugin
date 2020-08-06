@@ -5,7 +5,7 @@ class MetricsRegistry
 {
     public function __construct($metrics = [])
     {
-        $storage = extension_loaded('apc') && ini_get('apc.enabled')
+        $storage = function_exists('apcu_enabled') && apcu_enabled()
             ? new \Prometheus\Storage\APC()
             : new \Prometheus\Storage\InMemory();
         $this->registry = new \Prometheus\CollectorRegistry($storage);
