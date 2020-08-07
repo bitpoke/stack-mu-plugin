@@ -173,6 +173,11 @@ class MetricsCollector
         }
     }
 
+    private function isWoocommerce()
+    {
+        return function_exists('is_woocommerce') && is_woocommerce();
+    }
+
     private function canCollectWpdbMetrics()
     {
         return defined('SAVEQUERIES') && SAVEQUERIES;
@@ -180,7 +185,7 @@ class MetricsCollector
 
     private function canCollectWoocommerceMetrics()
     {
-        return function_exists('is_woocommerce') && is_woocommerce();
+        return $this::isWoocommerce();
     }
 
     private function getRequestType()
@@ -193,6 +198,26 @@ class MetricsCollector
         }
         if (defined('DOING_AJAX') && DOING_AJAX) {
             return 'admin-ajax';
+        }
+        if ($this::isWoocommerce()) {
+            if (function_exists('is_shop') && is_shop()) {
+                return 'shop';
+            }
+            if (function_exists('is_product_category') && is_product_category()) {
+                return 'product_category';
+            }
+            if (function_exists('is_product') && is_product()) {
+                return 'product';
+            }
+            if (function_exists('is_cart') && is_cart()) {
+                return 'checkout';
+            }
+            if (function_exists('is_checkout') && is_checkout()) {
+                return 'checkout';
+            }
+            if (function_exists('is_account_page') && is_account_page()) {
+                return 'is_account_page';
+            }
         }
         if (is_admin()) {
             return 'admin';
