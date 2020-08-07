@@ -1,3 +1,4 @@
+WP_Test_REST_Schema_Initialization::test_expected_routes_in_schema
 \Tests_Image_Functions::test_fallback_intermediate_image_sizes$
 \Tests_Image_Functions::test_crop_setting_for_pdf$
 \Tests_Image_Functions::test_pdf_preview_doesnt_overwrite_existing_jpeg$
@@ -9,4 +10,3 @@
 \Tests_Basic::test_license
 \Tests_DB::test_get_col
 \Tests_DB::test_empty_where_on_update
-test_expected_routes_in_schema
