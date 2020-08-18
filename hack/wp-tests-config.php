@@ -5,11 +5,10 @@ $root_dir = dirname(__DIR__);
 require_once $root_dir . '/vendor/autoload.php';
 
 use Roots\WPConfig\Config;
-
 /**
- * Expose global env() function from oscarotero/env
+ * Use env() from oscarotero/env
  */
-Env::init();
+use function Env\env;
 
 /**
  * Use Dotenv to set required environment variables and load .env file in root
