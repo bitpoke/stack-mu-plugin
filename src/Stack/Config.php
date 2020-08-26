@@ -1,6 +1,11 @@
 <?php
 namespace Stack;
 
+/**
+ * Use env() from oscarotero/env
+ */
+use function Env\env;
+
 class Config
 {
     public static function loadDefaults()
@@ -10,10 +15,6 @@ class Config
         if ($runCount > 0) {
             return;
         }
-        /*
-         * Expose global env() function from oscarotero/env
-         */
-        \Env::init();
 
         $uploads = wp_upload_dir(null, false, false);
         $homeURL = home_url();

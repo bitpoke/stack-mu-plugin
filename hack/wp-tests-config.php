@@ -5,11 +5,10 @@ $root_dir = dirname(__DIR__);
 require_once $root_dir . '/vendor/autoload.php';
 
 use Roots\WPConfig\Config;
-
 /**
- * Expose global env() function from oscarotero/env
+ * Use env() from oscarotero/env
  */
-Env::init();
+use function Env\env;
 
 /**
  * Use Dotenv to set required environment variables and load .env file in root
@@ -36,6 +35,10 @@ mkdir($tempfile);
 register_shutdown_function(function() use ($tempfile) { `rm -rf "$tempfile"`; });
 
 Config::define('STACK_MEDIA_BUCKET', "file://$tempfile");
+
+if (!defined('STACK_RUN_CORE_TESTS')) {
+	define('STACK_METRICS_ENABLED', false);
+}
 
 // Test with multisite enabled.
 // Alternatively, use the tests/phpunit/multisite.xml configuration file.

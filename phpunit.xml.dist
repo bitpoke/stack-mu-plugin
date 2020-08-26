@@ -32,6 +32,7 @@
 
     <php>
         <const name="WP_RUN_CORE_TESTS" value="1" />
+        <const name="STACK_RUN_CORE_TESTS" value="1" />
     </php>
 
     <listeners>
