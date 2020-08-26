@@ -36,6 +36,10 @@ register_shutdown_function(function() use ($tempfile) { `rm -rf "$tempfile"`; })
 
 Config::define('STACK_MEDIA_BUCKET', "file://$tempfile");
 
+if (!defined('STACK_RUN_CORE_TESTS')) {
+	define('STACK_METRICS_ENABLED', false);
+}
+
 // Test with multisite enabled.
 // Alternatively, use the tests/phpunit/multisite.xml configuration file.
 // define( 'WP_TESTS_MULTISITE', true );
