@@ -38,7 +38,7 @@ class Config
         self::defineFromEnv("MEMCACHED_HOST", "");
         self::defineFromEnv("MEMCACHED_DISCOVERY_HOST", "");
 
-        self::defineFromEnv("STACK_PAGE_CACHE_ENABLED", true);
+        self::defineFromEnv("STACK_PAGE_CACHE_ENABLED", false);
         self::defineFromEnv("STACK_PAGE_CACHE_AUTOMATIC_PLUGIN_ON_OFF", true);
         self::defineFromEnv("STACK_PAGE_CACHE_BACKEND", "");
         self::defineFromEnv("STACK_PAGE_CACHE_MEMCACHED_USE_VERSIONED_KEYS", true);
@@ -64,7 +64,7 @@ class Config
         self::definePath("GIT_KEY_FILE", "/var/run/secrets/presslabs.org/instance/id_rsa");
         self::definePath("GIT_KEY_FILE", (rtrim(env("HOME"), '/') ?: "/var/www") . "/.ssh/id_rsa");
 
-        self::defineFromEnv("STACK_METRICS_ENABLED", true);
+        self::defineFromEnv("STACK_METRICS_ENABLED", false);
         self::define('STACK_REST_API_VERSION', '1');
 
         $runCount++;
