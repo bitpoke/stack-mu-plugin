@@ -41,7 +41,6 @@ class Config
         self::defineFromEnv("STACK_PAGE_CACHE_ENABLED", false);
         self::defineFromEnv("STACK_PAGE_CACHE_AUTOMATIC_PLUGIN_ON_OFF", true);
         self::defineFromEnv("STACK_PAGE_CACHE_BACKEND", "");
-        self::defineFromEnv("STACK_PAGE_CACHE_MEMCACHED_USE_VERSIONED_KEYS", true);
         self::defineFromEnv("STACK_PAGE_CACHE_KEY_PREFIX", "");
 
         if (STACK_PAGE_CACHE_BACKEND == "redis") {
@@ -53,10 +52,7 @@ class Config
             self::defineFromEnv("RT_WP_NGINX_HELPER_MEMCACHED_PORT", "", "STACK_PAGE_CACHE_MEMCACHED_PORT");
             self::define("RT_WP_NGINX_HELPER_MEMCACHED_PREFIX", STACK_PAGE_CACHE_KEY_PREFIX);
 
-            $versionedCacheKey = "";
-            if (STACK_PAGE_CACHE_MEMCACHED_USE_VERSIONED_KEYS) {
-                $versionedCacheKey = STACK_PAGE_CACHE_KEY_PREFIX . "version";
-            }
+            $versionedCacheKey = STACK_PAGE_CACHE_KEY_PREFIX . "version";
             self::define("RT_WP_NGINX_HELPER_MEMCACHED_VERSIONED_CACHE_KEY", $versionedCacheKey);
         }
 
