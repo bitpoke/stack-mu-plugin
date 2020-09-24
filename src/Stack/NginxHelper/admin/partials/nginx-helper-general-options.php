@@ -24,6 +24,7 @@ $args = array(
 	'memcached_port'                   => FILTER_SANITIZE_STRING,
 	'memcached_prefix'                 => FILTER_SANITIZE_STRING,
 	'memcached_versioned_cache_key'    => FILTER_SANITIZE_STRING,
+	'memcached_query_string_version_key_prefix'    => FILTER_SANITIZE_STRING,
 	'purge_homepage_on_edit'           => FILTER_SANITIZE_STRING,
 	'purge_homepage_on_del'            => FILTER_SANITIZE_STRING,
 	'purge_url'                        => FILTER_SANITIZE_STRING,
@@ -344,6 +345,21 @@ if ( is_multisite() ) {
 								esc_html_e( "Also wildcard ('*') invalidation is not available with this setting. Don't use this setting or use Redis if you need this feature.", 'nginx-helper' );
 								?>
 								</p>
+							</td>
+						</tr>
+						<tr>
+							<th><label for="memcached_query_string_version_key_prefix"><?php esc_html_e( 'Query String Version Prefix', 'nginx-helper' ); ?></label></th>
+							<td>
+								<input id="memcached_query_string_version_key_prefix" class="medium-text" type="text" name="memcached_query_string_version_key_prefix" value="<?php echo esc_attr( $nginx_helper_settings['memcached_query_string_version_key_prefix'] ); ?>" <?php echo ( $nginx_helper_settings['memcached_enabled_by_constant'] ) ? 'readonly="readonly"' : ''; ?> />
+								<?php
+								if ( $nginx_helper_settings['memcached_enabled_by_constant'] ) {
+
+									echo '<p class="description">';
+									esc_html_e( 'Overridden by constant variables.', 'nginx-helper' );
+									echo '</p>';
+
+								}
+								?>
 							</td>
 						</tr>
 					</table>
