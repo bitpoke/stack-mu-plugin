@@ -82,7 +82,7 @@ class MetricsCollector
     public function collectRequestMetrics()
     {
         $requestType = $this::getRequestType();
-        $requestTime = timer_stop(0, 12);
+        $requestTime = $this::getRequestTime();
         $peakMemory  = memory_get_peak_usage();
 
         $this->metrics->getCounter('wp.requests')->incBy(
@@ -236,5 +236,13 @@ class MetricsCollector
         }
 
         return 'other';
+    }
+
+    private function getRequestTime() {
+        global $timestart, $timeend;
+        $precision = 12;
+        $timeend   = microtime(true);
+        $timetotal = $timeend - $timestart;
+        return number_format($timetotal, $precision);
     }
 }
