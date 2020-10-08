@@ -238,7 +238,8 @@ class MetricsCollector
         return 'other';
     }
 
-    private function getRequestTime() {
+    private function getRequestTime()
+    {
         global $timestart, $timeend;
         $precision = 12;
         $timeend   = microtime(true);
