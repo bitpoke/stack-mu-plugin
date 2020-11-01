@@ -137,8 +137,7 @@ class MetricsCollector
 
     public function preEchoResponse($result, $server, $request)
     {
-
-        if ($request->get_route() == "/stack/v" . STACK_REST_API_VERSION . "/metrics") {
+        if ($request->get_route() == "/stack/v" . STACK_REST_API_VERSION . "/metrics" && is_string($result)) {
             echo $result;
             return null;
         }
@@ -148,9 +147,9 @@ class MetricsCollector
 
     public function render()
     {
-        $response = new WP_REST_Response( $this->metrics->render() );
+        $response = new WP_REST_Response($this->metrics->render());
 
-        $response->header('Content-type',  \Prometheus\RenderTextFormat::MIME_TYPE);
+        $response->header('Content-type', \Prometheus\RenderTextFormat::MIME_TYPE);
         $response->header('Cache-Control', 'no-cache,max-age=0');
 
         return $response;

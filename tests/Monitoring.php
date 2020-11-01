@@ -9,21 +9,22 @@ use Stack\MetricsRegistry;
 use WP_REST_Request;
 use Spy_REST_Server;
 
-
 class MonitoringUnitTest extends TestCase
 {
-	public function setUp() {
-		parent::setUp();
+    public function setUp()
+    {
+        parent::setUp();
 
-		// Override the normal server with the spying server.
-		$GLOBALS['wp_rest_server'] = new Spy_REST_Server();
-		do_action( 'rest_api_init', $GLOBALS['wp_rest_server'] );
-	}
+        // Override the normal server with the spying server.
+        $GLOBALS['wp_rest_server'] = new Spy_REST_Server();
+        do_action('rest_api_init', $GLOBALS['wp_rest_server']);
+    }
 
-	public function tearDown() {
-		remove_filter( 'wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ) );
-		parent::tearDown();
-	}
+    public function tearDown()
+    {
+        remove_filter('wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ));
+        parent::tearDown();
+    }
 
     public function testMetricsRendering()
     {
@@ -81,9 +82,9 @@ class MonitoringUnitTest extends TestCase
     {
         $mc = new MetricsCollector();
 
-		$endpoints = $GLOBALS['wp_rest_server']->get_raw_endpoint_data();
+        $endpoints = $GLOBALS['wp_rest_server']->get_raw_endpoint_data();
 
-		$this->assertArrayHasKey('/stack/v1/metrics', $endpoints );
+        $this->assertArrayHasKey('/stack/v1/metrics', $endpoints);
     }
 
     public function testMetricsEndpointRender()
@@ -91,22 +92,25 @@ class MonitoringUnitTest extends TestCase
         $mc = new MetricsCollector();
 
 
-		$request  = new WP_REST_Request( 'GET', '/stack/v1/metrics' );
-		$response = rest_get_server()->dispatch( $request );
+        $request  = new WP_REST_Request('GET', '/stack/v1/metrics');
+        $response = rest_get_server()->dispatch($request);
 
-		$this->assertContains('php_info{version=', $response->data );
+        $this->assertContains('php_info{version=', $response->data);
     }
 
     public function testMetricsPreEchoResponse()
     {
         $mc = new MetricsCollector();
 
-        $out = $mc->preEchoResponse("test", $GLOBALS['wp_rest_server'], new WP_REST_Request( 'GET', '/stack/v1/metrics' ));
+        $out = $mc->preEchoResponse(
+            "test",
+            $GLOBALS['wp_rest_server'],
+            new WP_REST_Request('GET', '/stack/v1/metrics')
+        );
         $this->assertNull($out);
 
 
-        $out = $mc->preEchoResponse("test", $GLOBALS['wp_rest_server'], new WP_REST_Request( 'GET', '/wp/v2/' ));
+        $out = $mc->preEchoResponse("test", $GLOBALS['wp_rest_server'], new WP_REST_Request('GET', '/wp/v2/'));
         $this->assertEquals("test", $out);
     }
-
 }
