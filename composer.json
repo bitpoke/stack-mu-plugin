@@ -26,7 +26,7 @@
         "composer/installers": "~1.9",
         "google/cloud-storage": "^1.21",
         "google/auth": "^1.9.0",
-        "endclothing/prometheus_client_php": "^1.0"
+        "promphp/prometheus_client_php": "^2.1"
     },
     "config": {
         "optimize-autoloader": true

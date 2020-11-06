@@ -1,6 +1,8 @@
 <?php
 namespace Stack;
 
+use WP_REST_Response;
+
 class MetricsCollector
 {
     private $registry;
@@ -125,9 +127,32 @@ class MetricsCollector
         register_rest_route($namespace, '/' . $base, array(
             array(
                 'methods'  => \WP_REST_Server::READABLE,
-                'callback' => [$this->metrics, 'render']
+                'callback' => [$this, 'render'],
+                'permission_callback' => '__return_true',
             )
         ));
+
+        add_filter('rest_pre_echo_response', [$this, 'preEchoResponse'], 9999, 3);
+    }
+
+    public function preEchoResponse($result, $server, $request)
+    {
+        if ($request->get_route() == "/stack/v" . STACK_REST_API_VERSION . "/metrics" && is_string($result)) {
+            echo $result;
+            return null;
+        }
+
+        return $result;
+    }
+
+    public function render()
+    {
+        $response = new WP_REST_Response($this->metrics->render());
+
+        $response->header('Content-type', \Prometheus\RenderTextFormat::MIME_TYPE);
+        $response->header('Cache-Control', 'no-cache,max-age=0');
+
+        return $response;
     }
 
     public function collectWpdbStats($queryData, $query, $queryTime, $queryCallstack, $queryStart)

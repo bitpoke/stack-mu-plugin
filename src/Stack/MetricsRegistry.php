@@ -66,12 +66,7 @@ class MetricsRegistry
     public function render()
     {
         $renderer = new \Prometheus\RenderTextFormat();
-        $result = $renderer->render($this->registry->getMetricFamilySamples());
 
-        header('Content-type: ' . \Prometheus\RenderTextFormat::MIME_TYPE);
-        header('Cache-Control: no-cache,max-age=0');
-
-        echo $result;
-        exit();
+        return $renderer->render($this->registry->getMetricFamilySamples());
     }
 }
