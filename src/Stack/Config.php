@@ -24,7 +24,8 @@ class Config
          * this takes into account CONTENT_DIR (defined by bedrock setups)
          * and defaults to `wp-content/uploads`
          */
-        if ($homeURL === substr($uploads['baseurl'], 0, strlen($homeURL))) {
+        if ($homeURL === substr($uploads['baseurl'], 0, strlen($homeURL)) &&
+            !(substr($homeURL, -strlen("/wp")) === "/wp")) {
             $relUploadsDir = substr($uploads['baseurl'], strlen($homeURL));
         } else {
             $relUploadsDir = (defined('CONTENT_DIR') ? CONTENT_DIR : '/wp-content') . '/uploads';
