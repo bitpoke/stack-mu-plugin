@@ -41,7 +41,7 @@
         "dealerdirect/phpcodesniffer-composer-installer": "~0.6.2",
         "wp-coding-standards/wpcs": "~2.3.0",
         "roave/security-advisories": "dev-master",
-        "roots/wordpress": "^5.5",
+        "roots/wordpress": "^5.6",
         "phpunit/phpunit": "^6.5",
         "roots/wp-config": "1.0.0",
         "wpackagist-plugin/debug-bar": "^1.0",
