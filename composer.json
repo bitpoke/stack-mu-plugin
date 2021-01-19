@@ -21,7 +21,7 @@
       }
     ],
     "require": {
-        "vlucas/phpdotenv": "^4.1.8",
+        "vlucas/phpdotenv": ">=4.1.8 <6",
         "oscarotero/env": "^2.1",
         "composer/installers": "~1.9",
         "google/cloud-storage": "^1.21",
