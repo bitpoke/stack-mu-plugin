@@ -34,10 +34,10 @@ class GoogleCloudStorage implements BlobStore
     {
         if (null === $this->client) {
             $clientConfig = [
-                'suppressKeyFileNotice' => getenv('SUPPRESS_GCLOUD_CREDS_WARNING') == 'true',
+                'suppressKeyFileNotice' => $_ENV['SUPPRESS_GCLOUD_CREDS_WARNING'] == 'true',
             ];
 
-            $envCreds = getenv('GOOGLE_CREDENTIALS');
+            $envCreds = $_ENV['GOOGLE_CREDENTIALS'];
             if (!empty($envCreds)) {
                 $envCreds = json_decode($envCreds, true);
                 $clientConfig['keyFile'] = $envCreds;
