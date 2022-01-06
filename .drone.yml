@@ -1,5 +1,5 @@
 kind: pipeline
-name: php-7.3
+name: default
 
 clone:
   disable: true
@@ -12,19 +12,17 @@ steps:
       tags: true
 
   - name: dependencies
-    image: quay.io/presslabs/php-runtime:7.3.7
-    user: root
+    image: docker.io/bitpoke/build:v0.7.4
     commands:
       - composer install --prefer-dist
 
   - name: lint
-    image: quay.io/presslabs/php-runtime:7.3.7
-    user: root
+    image: docker.io/bitpoke/build:v0.7.4
     commands:
       - make lint
 
   - name: test
-    image: quay.io/presslabs/php-runtime:7.3.7
+    image: docker.io/bitpoke/build:v0.7.4
     user: root
     environment:
       DB_TEST_HOST: database
@@ -36,7 +34,7 @@ steps:
       - make test-runtime
 
   - name: integration test
-    image: quay.io/presslabs/php-runtime:7.3.7
+    image: docker.io/bitpoke/build:v0.7.4
     user: root
     environment:
       DB_TEST_HOST: database
@@ -49,7 +47,7 @@ steps:
 
   - name: bundle
     pull: always
-    image: quay.io/presslabs/bfc
+    image: docker.io/bitpoke/build:v0.7.4
     user: root
     commands:
       - make bundle
