@@ -9,7 +9,7 @@ PHPCS ?= $(PWD)/hack/php-noxdebug $(PWD)/vendor/bin/phpcs
 
 SKIPPED_TESTS := $(shell paste -s -d'|' hack/skip-wp-tests)
 
-GIT_VERSION = $(shell git describe --always --abbrev=7 --dirty)
+GIT_VERSION := $(shell git describe --dirty --always --tags --abbrev=7 | sed 's/-/./2' | sed 's/-/./2' )
 
 ARGS ?=
 
