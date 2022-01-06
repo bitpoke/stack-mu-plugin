@@ -51,7 +51,8 @@
         "roots/wp-config": "1.0.0",
         "wpackagist-plugin/debug-bar": "^1.0",
         "wpackagist-plugin/debug-bar-console": "^0.3.0",
-        "wpackagist-plugin/debug-bar-constants": "^2.0"
+        "wpackagist-plugin/debug-bar-constants": "^2.0",
+        "yoast/phpunit-polyfills": "^1.0"
     },
     "scripts": {
         "lint": "phpcs",
