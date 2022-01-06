@@ -8,5 +8,11 @@ WP_Test_REST_Schema_Initialization::test_expected_routes_in_schema
 \Tests_Privacy_WpPrivacyDeleteOldExportFiles
 \Tests_Privacy_WpPrivacyGeneratePersonalDataExportFile
 \Tests_Basic::test_license
+\Tests_Basic::test_security_md
 \Tests_DB::test_get_col
 \Tests_DB::test_empty_where_on_update
+\Tests_Theme::test_year_in_readme
+\Tests_Dependencies_Styles::test_block_styles_for_viewing_without_split_styles
+\Tests_Dependencies_Styles::test_block_styles_for_viewing_with_split_styles
+\WP_REST_Block_Directory_Controller_Test::test_get_items_no_results
+\WP_REST_Plugins_Controller_Test::test_create_item
