@@ -20,6 +20,8 @@ steps:
     image: docker.io/bitpoke/build:v0.7.4
     commands:
       - make lint
+    when:
+      event: [push, pull_request]
 
   - name: test
     image: docker.io/bitpoke/build:v0.7.4
@@ -32,6 +34,8 @@ steps:
       MEMCACHED_TEST_HOST: memcache:11211
     commands:
       - make test-runtime
+    when:
+      event: [push, pull_request]
 
   - name: integration test
     image: docker.io/bitpoke/build:v0.7.4
@@ -44,6 +48,8 @@ steps:
       MEMCACHED_TEST_HOST: memcache:11211
     commands:
       - make test-wp
+    when:
+      event: [push, pull_request]
 
   - name: bundle
     pull: always
@@ -55,7 +61,7 @@ steps:
       event: tag
 
   - name: publish
-    image: plugins/github-release
+    image: plugins/github-release@sha256:78bf13eda852e815310a5c4faf3ad04fd0c1c07bf661b4f979ab296f044f9cbd
     settings:
       api_key:
         from_secret: GH_TOKEN
@@ -76,6 +82,10 @@ services:
       MYSQL_PASSWORD: not-so-secure-but-good-for-ci
       MYSQL_ROOT_PASSWORD: insecure-root-password-but-good-for-ci
       MYSQL_USER: wordpress
+    when:
+      event: [push, pull_request]
 
   - name: memcache
     image: memcached:1.5.10-alpine
+    when:
+      event: [push, pull_request]
