@@ -11,7 +11,7 @@ if (empty($wp_version)) {
     $composer = json_decode(file_get_contents(dirname(__DIR__) . '/composer.lock'), true);
 	if (!empty($composer["packages-dev"])) {
 		foreach($composer["packages-dev"] as $req) {
-			if (in_array(@$req["name"], array("presslabs-stack/wordpress","roots/wordpress"))) {
+			if (in_array(@$req["name"], array("bitpoke-stack/wordpress","roots/wordpress"))) {
 				@$wp_version = $req["version"];
 				break;
 			}

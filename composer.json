@@ -4,14 +4,14 @@
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "Presslabs",
-            "email": "ping@presslabs.com",
-            "homepage": "http://www.presslabs.com/stack"
+            "name": "Bitpoke",
+            "email": "hello@bitpoke.io",
+            "homepage": "http://www.bitpoke.io/stack"
         }
     ],
     "support": {
-        "issues": "https://github.com/presslabs/stack-mu-plugin/issues",
-        "docs": "https://presslabs.com/docs/stack"
+        "issues": "https://github.com/bitpoke/stack-mu-plugin/issues",
+        "docs": "https://www.bitpoke.io/docs/stack"
     },
     "type": "wordpress-muplugin",
     "repositories": [
