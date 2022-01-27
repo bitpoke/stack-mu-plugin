@@ -6,28 +6,9 @@
 >
     <testsuites>
         <!-- Default test suite to run all tests -->
-        <testsuite>
+        <testsuite name="bitpoke-stack-mu-plugin">
             <directory suffix=".php">tests</directory>
         </testsuite>
-
-        <filter>
-            <blacklist>
-                <file>/drone/src/wordpress-develop/tests/phpunit/tests/image/functions.php</file>
-
-                <file>wordpress-develop/tests/phpunit/tests/image/functions.php</file>
-                <file>./wordpress-develop/tests/phpunit/tests/image/functions.php</file>
-
-                <file>tests/image/functions.php</file>
-                <file>./tests/image/functions.php</file>
-
-
-                <file>image/functions.php</file>
-                <file>./image/functions.php</file>
-
-                <file>functions.php</file>
-                <file>./functions.php</file>
-            </blacklist>
-        </filter>
     </testsuites>
 
     <php>
@@ -36,7 +17,7 @@
     </php>
 
     <listeners>
-        <listener class="SpeedTrapListener" file="wordpress-develop/tests/phpunit/includes/speed-trap-listener.php">
+        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener">
             <arguments>
                 <array>
                     <element key="slowThreshold">
@@ -67,22 +48,5 @@
                 <file>./functions.php</file>
             </exclude>
         </whitelist>
-
-        <blacklist>
-            <file>/drone/src/wordpress-develop/tests/phpunit/tests/image/functions.php</file>
-
-            <file>wordpress-develop/tests/phpunit/tests/image/functions.php</file>
-            <file>./wordpress-develop/tests/phpunit/tests/image/functions.php</file>
-
-            <file>tests/image/functions.php</file>
-            <file>./tests/image/functions.php</file>
-
-
-            <file>image/functions.php</file>
-            <file>./image/functions.php</file>
-
-            <file>functions.php</file>
-            <file>./functions.php</file>
-        </blacklist>
     </filter>
 </phpunit>
