@@ -8,6 +8,7 @@ functionalities with WordPress, such as:
 * uploading and serving media files from object storage systems such as
   Google Cloud Storage or AWS S3
 * object-cache implementation on top of memcached
+* offloading assets to a CDN
 
 ## Install
 
@@ -40,6 +41,16 @@ In order to use the custom object cache, you'll need to copy it into the root of
 
 ```console
 $ cp wp-content/mu-plugins/stack-mu-plugin/src/object-cache.php wp-content/
+```
+
+### Enable and use a CDN for static files
+
+All that is needed is setting the `CDN_HOST` variable in wp-config.php and of course a CNAME record in your DNS manager pointing to your CDN provider.
+
+For example, we might use in our config file:
+
+```php
+define('CDN_HOST', 'cdn.bitpoke.io');
 ```
 
 ## Development
