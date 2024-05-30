@@ -15,14 +15,15 @@
     },
     "type": "wordpress-muplugin",
     "repositories": [
-      {
-        "type": "composer",
-        "url": "https://wpackagist.org"
-      }
+        {
+            "type": "composer",
+            "url": "https://wpackagist.org"
+        }
     ],
     "require": {
         "php": ">=7.4",
         "composer/installers": "^1.9 || ^2.0",
+        "automattic/jetpack-autoloader": "^3",
         "vlucas/phpdotenv": ">=4.1.8 <6",
         "oscarotero/env": "^2.1",
         "google/cloud-storage": "^1.28",
@@ -34,7 +35,8 @@
         "allow-plugins": {
             "roots/wordpress-core-installer": true,
             "composer/installers": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "automattic/jetpack-autoloader": true
         }
     },
     "autoload": {
@@ -63,9 +65,15 @@
     "extra": {
         "wordpress-install-dir": "web/wp",
         "installer-paths": {
-            "web/wp-content/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-            "web/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
-            "web/wp-content/themes/{$name}/": ["type:wordpress-theme"]
+            "web/wp-content/mu-plugins/{$name}/": [
+                "type:wordpress-muplugin"
+            ],
+            "web/wp-content/plugins/{$name}/": [
+                "type:wordpress-plugin"
+            ],
+            "web/wp-content/themes/{$name}/": [
+                "type:wordpress-theme"
+            ]
         }
     }
 }
