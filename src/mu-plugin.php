@@ -8,3 +8,4 @@ new Stack\QuerySplit();
 new Stack\NginxHelperActivator();
 new Stack\MetricsCollector();
 new Stack\ContentFilter();
+new Stack\Integrations\WooCommerce();
