@@ -1,15 +1,16 @@
 stack-mu-plugin
-[![Build Status](https://ci.bitpoke.io/api/badges/bitpoke/stack-mu-plugin/status.svg)](https://ci.bitpoke.io/bitpoke/stack-mu-plugin)
 ===
 Bitpoke Stack must use plugin for WordPress.
 
-It provides integration for [Bitpoke Stack](https://www.bitpoke.io/stack)
-functionalities with WordPress, such as:
-* uploading and serving media files from object storage systems such as
-  Google Cloud Storage or AWS S3
+It provides integration for the [Bitpoke Stack](https://www.bitpoke.io/stack)
+functionalities with WordPress and WooCommerce, such as:
+
+* uploading and serving media files from object storage systems, currently with Google Cloud Storage
 * object-cache implementation on top of memcached
 * offloading assets to a CDN
-
+* unified handling of logs to stderr, by default
+* handling of duplicate, incompatible dependencies through [Jetpack Autoloader](https://github.com/Automattic/jetpack-autoloader)
+      
 ## Install
 
 ### Bedrock
@@ -76,7 +77,7 @@ $ wp server
 Running plugin tests:
 
 ```console
-$ make test-runtime
+$ make test-wp
 ```
 
 Running integration tests:
