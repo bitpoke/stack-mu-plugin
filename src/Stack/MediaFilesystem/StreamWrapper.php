@@ -21,6 +21,8 @@ class StreamWrapper
     const FILE_WRITABLE_MODE = 33206; // 100666 in octal
     const DIRECTORY_WRITABLE_MODE = 16895; // 40777 in octal
 
+    const WP_OBJECT_CACHE_GROUP = 'stack-media-fs';
+
     /**
      * @var BlobStore[] $clients The default clients to use if using
      *      global methods such as fopen on a stream wrapper. Keyed by protocol.
@@ -169,7 +171,7 @@ class StreamWrapper
 
         try {
             try {
-                $result = $this->client->get($path);
+                $result = $this->get($path);
             } catch (\Stack\BlobStore\Exceptions\NotFound $e) {
                 // File doesn't exist on File service so create new file
                 $result = '';
@@ -267,7 +269,7 @@ class StreamWrapper
 
         try {
             // Upload to blob storage
-            $this->client->set($this->path, file_get_contents($this->uri));
+            $this->set($this->path, file_get_contents($this->uri));
             return fflush($this->file);
         } catch (\Exception $e) {
             return false;
@@ -349,7 +351,7 @@ class StreamWrapper
         $path = $this->trim_path($path);
 
         try {
-            $this->client->remove($path);
+            $this->remove($path);
             $this->close_handler();
             return true;
         } catch (\Exception $e) {
@@ -415,7 +417,7 @@ class StreamWrapper
         }
 
         try {
-            $info = $this->client->getMeta($path);
+            $info = $this->getMeta($path);
 
             // Here we should parse the meta data into the statistics array
             // and then combine with data from `is_file` API
@@ -477,7 +479,7 @@ class StreamWrapper
             // Note: Subooptimal. Should figure out a way to do this without downloading the file as this could
             //       get really inefficient with large files
 
-            $result = $this->client->get($path_from);
+            $result = $this->get($path_from);
 
             // Convert to actual file to upload to new path
             $file     = $this->string_to_resource($result);
@@ -485,10 +487,10 @@ class StreamWrapper
             $filePath = $meta['uri'];
 
             // Upload to file service
-            $this->client->set($filePath, file_get_contents($file_to));
+            $this->set($filePath, file_get_contents($file_to));
 
             // Delete old file
-            $result = $this->client->remove($path_from);
+            $result = $this->remove($path_from);
 
             return true;
         } catch (\Exception $e) {
@@ -606,8 +608,7 @@ class StreamWrapper
      */
     public function stream_metadata($path, $option, $value)
     {
-        // all meta operation are noop, for broader compaibility with media plugin ecosystem
-        return true;
+        return false;
     }
 
     /**
@@ -722,5 +723,71 @@ class StreamWrapper
         $path = $this->trim_path($path);
         $extension = pathinfo($path, PATHINFO_EXTENSION);
         return empty($extension);
+    }
+
+    /**
+     * Gets and caches the $path metadata
+     */
+    protected function getMeta($path)
+    {
+        if (defined('STACK_MEDIA_FS_CACHE_TTL') && STACK_MEDIA_FS_CACHE_TTL > 0) {
+            $info = wp_cache_get($path, self::WP_OBJECT_CACHE_GROUP);
+            if (empty($info)) {
+                $info = $this->client->getMeta($path);
+                wp_cache_set($path, $info, self::WP_OBJECT_CACHE_GROUP, STACK_MEDIA_FS_CACHE_TTL);
+            }
+        } else {
+            $info = $this->client->getMeta($path);
+        }
+        return $info;
+    }
+
+    /**
+     * Creates a file by content
+     */
+    protected function set($path, $content)
+    {
+        $this->client->set($path, $content);
+        if (defined('STACK_MEDIA_FS_CACHE_TTL') && STACK_MEDIA_FS_CACHE_TTL > 0) {
+            $now = time();
+            $meta = [
+                "size" => strlen($content),
+                "atime" => $now,
+                "ctime" => $now,
+                "mtime" => $now,
+            ];
+            wp_cache_set($path, $meta, self::WP_OBJECT_CACHE_GROUP, STACK_MEDIA_FS_CACHE_TTL);
+        }
+    }
+
+    /**
+     * Gets a file content
+     */
+    protected function get($path)
+    {
+        $result = $this->client->get($path);
+        if (defined('STACK_MEDIA_FS_CACHE_TTL') && STACK_MEDIA_FS_CACHE_TTL > 0) {
+            $now = time();
+            $meta = [
+                "size" => strlen($result),
+                "atime" => $now,
+                "ctime" => $now,
+                "mtime" => $now,
+            ];
+            wp_cache_set($path, $meta, self::WP_OBJECT_CACHE_GROUP, STACK_MEDIA_FS_CACHE_TTL);
+        }
+        return $result;
+    }
+
+    /**
+     * Removes a file by path
+     */
+    protected function remove($path)
+    {
+        if (defined('STACK_MEDIA_FS_CACHE_TTL') && STACK_MEDIA_FS_CACHE_TTL > 0) {
+            wp_cache_delete($path, $meta, self::WP_OBJECT_CACHE_GROUP, STACK_MEDIA_FS_CACHE_TTL);
+        }
+        $result = $this->client->remove($path);
+        return $result;
     }
 }

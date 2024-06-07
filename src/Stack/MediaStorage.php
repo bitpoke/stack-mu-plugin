@@ -52,8 +52,7 @@ class MediaStorage
     public function register()
     {
         add_filter('upload_dir', [$this, 'filterUploadDir']);
-        add_filter('wp_delete_file', [$this, 'filterDeleteFile'], PHP_INT_MIN);
-        add_filter('wp_delete_file', [$this, 'deleteFile'], PHP_INT_MAX);
+        add_filter('wp_delete_file', [$this, 'filterDeleteFile']);
         add_filter('wp_image_editors', [$this, 'filterImageEditors']);
         add_action('init', [$this, 'serveImage']);
     }
@@ -61,8 +60,7 @@ class MediaStorage
     public function unregister()
     {
         remove_filter('upload_dir', [$this, 'filterUploadDir']);
-        remove_filter('wp_delete_file', [$this, 'filterDeleteFile'], PHP_INT_MIN);
-        remove_filter('wp_delete_file', [$this, 'deleteFile'], PHP_INT_MAX);
+        remove_filter('wp_delete_file', [$this, 'filterDeleteFile']);
         remove_filter('wp_image_editors', [$this, 'filterImageEditors']);
         remove_action('init', [$this, 'serveImage']);
     }
@@ -115,10 +113,7 @@ class MediaStorage
         // If multisite (and if not the main site in a post-MU network)
         // NOTICE: we support only post-MU network setups
         if (is_multisite() && !(is_main_network() && is_main_site() && defined('MULTISITE'))) {
-            $suffix = '/sites/' . get_current_blog_id();
-            if (!$this->endsWith($basedir, $suffix)) {
-                $basedir .= $suffix;
-            }
+            $basedir .= '/sites/' . get_current_blog_id();
         }
 
         $uploads['basedir'] = $basedir;
@@ -138,7 +133,7 @@ class MediaStorage
      *       https://core.trac.wordpress.org/ticket/38907#ticket
      *
      * Because path_join() doesn't recognize :// as an absolute path, we need
-     * to remove ://<host>:<port>/ since for thumbnail will multiply such prefixes
+     * to remove ://<host>:<port>/ since for thumbnail will multiple such prefixes
      * eg: ://<host>:<port>/wp-content/uploads/ftp://<host>:<port>/wp-content/uploads/...
      */
     public function filterDeleteFile(string $filePath) : string
@@ -152,19 +147,10 @@ class MediaStorage
             $filePath = $baseDir . $filePath;
         }
 
-        return $filePath;
-    }
-
-    // unlink() does not clear the cache if you are performing file_exists() on a remote file
-    // http://php.net/manual/en/function.clearstatcache.php#105888
-    public function deleteFile(string $filePath) : string
-    {
-        if (empty($filePath)) {
-            return $filePath;
-        }
-
         if ($this->startsWith($filePath, 'media://')) {
             @unlink($filePath);
+            // unlink() does not clear the cache if you are performing file_exists()
+            // http://php.net/manual/en/function.clearstatcache.php#105888
             clearstatcache();
             return '';
         }

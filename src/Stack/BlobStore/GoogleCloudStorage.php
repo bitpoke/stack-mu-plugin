@@ -67,9 +67,11 @@ class GoogleCloudStorage implements BlobStore
             $bucket = $this->getClient()->bucket($this->bucket);
             $object = $bucket->object($this->normalizePath($key));
             $result = $object->downloadAsString();
+            do_action('qm/debug', '{key}', ['key' => $key]);
             return $result;
         } catch (NotFoundException $e) {
             throw new \Stack\BlobStore\Exceptions\NotFound($e->getMessage());
+            do_action('qm/debug', '{key} not found', ['key' => $key]);
         }
     }
 
@@ -80,15 +82,18 @@ class GoogleCloudStorage implements BlobStore
             $object = $bucket->object($this->normalizePath($key));
             $info = $object->info();
         } catch (NotFoundException $e) {
+            do_action('qm/debug', '{key} not found', ['key' => $key]);
             throw new \Stack\BlobStore\Exceptions\NotFound($e->getMessage());
         }
         $now = time();
-        return [
+        $meta = [
             "size" => isset($info['size']) ? $info['size'] : 0,
             "atime" => isset($info['updated']) ? strtotime($info['updated']) : $now,
             "ctime" => isset($info['timeCreated']) ? strtotime($info['timeCreated']) : $now,
             "mtime" => isset($info['updated']) ? strtotime($info['updated']) : $now,
         ];
+        do_action('qm/debug', '{key} (meta: {meta})', ['key' => $key, 'meta' => json_encode($meta)]);
+        return $meta;
     }
 
     public function set(string $key, string $content)
@@ -99,7 +104,9 @@ class GoogleCloudStorage implements BlobStore
                 'name' => $this->normalizePath($key),
                 'resumable' => false,
             ]);
+            do_action('qm/debug', '{key}', ['key' => $key]);
         } catch (\Exception $e) {
+            do_action('qm/error', $e);
             throw new \Exception($e->getMessage());
         }
     }
@@ -110,7 +117,9 @@ class GoogleCloudStorage implements BlobStore
             $bucket = $this->getClient()->bucket($this->bucket);
             $object = $bucket->object($this->normalizePath($key));
             $object->delete();
+            do_action('qm/debug', '{key}', ['key' => $key]);
         } catch (NotFoundException $e) {
+            do_action('qm/warning', $e);
             throw new \Stack\BlobStore\Exceptions\NotFound($e->getMessage());
         }
     }
