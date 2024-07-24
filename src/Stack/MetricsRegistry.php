@@ -3,6 +3,9 @@ namespace Stack;
 
 class MetricsRegistry
 {
+    private $registry;
+    private $metrics = [];
+
     public function __construct($metrics = [])
     {
         $storage = function_exists('apcu_enabled') && apcu_enabled()

@@ -9,6 +9,7 @@ namespace Stack\Integrations\WooCommerce;
 /**
  * Class WC_Console_Log_Handler
  */
+// phpcs:ignore
 class WC_Console_Log_Handler extends \WC_Log_Handler
 {
     /**
@@ -34,6 +35,7 @@ class WC_Console_Log_Handler extends \WC_Log_Handler
         error_log($entry);
     }
 
+    // phpcs:ignore
     protected static function format_context($context)
     {
         $ctx = '';
@@ -56,6 +58,7 @@ class WC_Console_Log_Handler extends \WC_Log_Handler
      *
      * @return string Formatted log entry.
      */
+    // phpcs:ignore
     protected static function format_entry($timestamp, $level, $message, $context)
     {
         if (defined('STACK_JSON_LOG') && true === STACK_JSON_LOG) {
