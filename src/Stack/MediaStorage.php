@@ -4,6 +4,7 @@ namespace Stack;
 use \add_filter;
 use \remove_filter;
 use \path_is_absolute;
+use \WP_Filesystem_Direct;
 
 class MediaStorage
 {
@@ -11,6 +12,11 @@ class MediaStorage
      * @var string
      */
     private $relUploadsDir = null;
+
+    /**
+     * @var \Stack\BlobStore
+     */
+    private $blobStore = null;
 
     public function __construct()
     {
@@ -34,7 +40,8 @@ class MediaStorage
                 wp_die('Invalid protocol <code>' . $parts['scheme'] . '</code> for media storage.');
         }
 
-        $fs = \Stack\MediaFilesystem\StreamWrapper::register($blobStore, "media");
+        $this->blobStore = $blobStore;
+        $fs = \Stack\MediaFilesystem\StreamWrapper::register($this->blobStore, "media");
         $this->register();
     }
 
@@ -56,6 +63,8 @@ class MediaStorage
         add_filter('wp_delete_file', [$this, 'deleteFile'], PHP_INT_MAX);
         add_filter('wp_image_editors', [$this, 'filterImageEditors']);
         add_action('init', [$this, 'serveImage']);
+        add_filter('filesystem_method', [$this, 'filesystemMethod'], PHP_INT_MAX);
+        add_filter('request_filesystem_credentials', [$this, 'filesystemCredentials'], PHP_INT_MAX, 3);
     }
 
     public function unregister()
@@ -65,6 +74,19 @@ class MediaStorage
         remove_filter('wp_delete_file', [$this, 'deleteFile'], PHP_INT_MAX);
         remove_filter('wp_image_editors', [$this, 'filterImageEditors']);
         remove_action('init', [$this, 'serveImage']);
+        remove_filter('filesystem_method', [$this, 'filesystemMethod'], PHP_INT_MAX);
+        remove_filter('request_filesystem_credentials', [$this, 'filesystemCredentials'], PHP_INT_MAX, 3);
+    }
+
+    public function filesystemMethod()
+    {
+        // Force WordPress to use our custom filesystem method
+        return 'stack';
+    }
+
+    public function filesystemCredentials($credentials, $form_post, $type)
+    {
+        return [ new \WP_Filesystem_Direct(null) ];
     }
 
     public function serveImage()

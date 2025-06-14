@@ -5,7 +5,7 @@ class MediaStorageTest extends \WP_UnitTestCase
 {
     private $mediaStoragePlugin = null;
 
-    public function setUp()
+    public function setUp():void
     {
         require_once(ABSPATH . WPINC . '/class-wp-image-editor.php');
         require_once(ABSPATH . WPINC . '/class-wp-image-editor-gd.php');
@@ -61,7 +61,7 @@ class MediaStorageTest extends \WP_UnitTestCase
 
             $this->assertFileExists($file);
             wp_delete_file($file);
-            $this->assertFileNotExists($file);
+            $this->assertFileDoesNotExist($file);
         }
     }
 
@@ -110,7 +110,7 @@ class MediaStorageTest extends \WP_UnitTestCase
 
             $this->assertFileExists($file);
             wp_delete_file($file);
-            $this->assertFileNotExists($file);
+            $this->assertFileDoesNotExist($file);
         }
     }
 

@@ -1,4 +1,10 @@
 <?php
+require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+class WP_Filesystem_Stack extends Stack\WP_Filesystem_Stack
+{
+}
 
 Stack\Config::loadDefaults();
 

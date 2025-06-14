@@ -13,7 +13,7 @@ class CDNOffloaderUnitTest extends TestCase
     private $non_offloaded_hosts = array("external.com", "external.org");
     private $non_offloaded_paths = array("", "not-offloaded", ".internal", "api");
 
-    public function setUp()
+    public function setUp():void
     {
         parent::setUp();
         unset($_SERVER['HTTPS']); // reset https

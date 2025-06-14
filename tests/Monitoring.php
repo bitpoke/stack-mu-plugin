@@ -11,7 +11,7 @@ use Spy_REST_Server;
 
 class MonitoringUnitTest extends TestCase
 {
-    public function setUp()
+    public function setUp():void
     {
         parent::setUp();
 
@@ -20,7 +20,7 @@ class MonitoringUnitTest extends TestCase
         do_action('rest_api_init', $GLOBALS['wp_rest_server']);
     }
 
-    public function tearDown()
+    public function tearDown():void
     {
         remove_filter('wp_rest_server_class', array( $this, 'filter_wp_rest_server_class' ));
         parent::tearDown();
@@ -63,11 +63,11 @@ class MonitoringUnitTest extends TestCase
         );
 
         $output = $mr->render();
-        $this->assertContains('php_info{version=', $output);
-        $this->assertContains('wp_requests{request_type="request_type"} 1', $output);
-        $this->assertContains('wp_page_generation_time_bucket{request_type="request_type",le="1"} 0', $output);
-        $this->assertContains('wp_page_generation_time_bucket{request_type="request_type",le="2.5"} 1', $output);
-        $this->assertContains('wpdb_slow_query_treshold 4', $output);
+        $this->assertStringContainsString('php_info{version=', $output);
+        $this->assertStringContainsString('wp_requests{request_type="request_type"} 1', $output);
+        $this->assertStringContainsString('wp_page_generation_time_bucket{request_type="request_type",le="1"} 0', $output);
+        $this->assertStringContainsString('wp_page_generation_time_bucket{request_type="request_type",le="2.5"} 1', $output);
+        $this->assertStringContainsString('wpdb_slow_query_treshold 4', $output);
     }
 
     public function testMetricsHooks()
@@ -95,7 +95,7 @@ class MonitoringUnitTest extends TestCase
         $request  = new WP_REST_Request('GET', '/stack/v1/metrics');
         $response = rest_get_server()->dispatch($request);
 
-        $this->assertContains('php_info{version=', $response->data);
+        $this->assertStringContainsString('php_info{version=', $response->data);
     }
 
     public function testMetricsPreEchoResponse()

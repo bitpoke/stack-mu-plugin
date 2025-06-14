@@ -100,6 +100,41 @@ class StreamWrapper
     private $protocol_prefix;
 
     /**
+     * Did we flushed the file?
+     *
+     * @since   1.0.0
+     * @access  private
+     * @var bool    Did flush the file
+     */
+    private $did_flush = false;
+
+    /**
+     * Open mode
+     *
+     * @since   1.0.0
+     * @access  private
+     * @var string|null  The open mode, if set
+     */
+    private $open_mode = null;
+
+    /**
+     * User information
+     *
+     * @since   1.0.0
+     * @access  protected
+     * @var array   User information
+     */
+    protected static $user_info = null;
+
+    /**
+     * Debug mode. When enabled, log operations.
+     *
+     * @since   1.0.0
+     * @access  public
+     */
+    protected $debug = false;
+
+    /**
      * StreamWrapper constructor
      *
      * @param BlobStore $client
@@ -107,9 +142,32 @@ class StreamWrapper
      */
     public function __construct(string $protocol = null)
     {
+        $this->debug = apply_filters('stack_filesystem_debug', false);
         $this->protocol = $protocol ?: self::DEFAULT_PROTOCOL;
         $this->protocol_prefix = $this->protocol . '://';
         $this->client = self::$clients[$this->protocol];
+        $this->get_user_info();
+    }
+
+    public function get_user_info()
+    {
+        if (static::$user_info === null) {
+            try {
+                static::$user_info = [
+                    'uid' => posix_getuid(),
+                    'gid' => posix_getgid(),
+                ];
+            } catch (\Exception) {
+                $t = tmpfile();
+                $stat = fstat($t);
+                @unlink($t);
+                static::$user_info = [
+                    'uid' => $stat['uid'] ?? 0,
+                    'gid' => $stat['gid'] ?? 0,
+                ];
+            }
+        }
+        return static::$user_info;
     }
 
     /**
@@ -165,7 +223,9 @@ class StreamWrapper
      */
     public function stream_open($path, $mode, $options, &$opened_path)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         $path = $this->trim_path($path);
+        $this->open_mode = $mode;
 
         try {
             try {
@@ -211,6 +271,14 @@ class StreamWrapper
      */
     public function stream_close()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
+
+        if ($this->open_mode == 'wb' && ! $this->did_flush) {
+            // If we opened the file in write mode and didn't flush it, we need to do that now
+            // This is to ensure that the file is uploaded to blob storage
+            $this->stream_flush();
+        }
+
         return $this->close_handler($this->file);
     }
 
@@ -224,6 +292,7 @@ class StreamWrapper
      */
     public function stream_eof()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         return feof($this->file);
     }
 
@@ -239,6 +308,7 @@ class StreamWrapper
      */
     public function stream_read($count)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         $string = fread($this->file, $count);
         if (false === $string) {
             trigger_error(
@@ -261,6 +331,7 @@ class StreamWrapper
      */
     public function stream_flush()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         if (! $this->file) {
             return false;
         }
@@ -268,6 +339,7 @@ class StreamWrapper
         try {
             // Upload to blob storage
             $this->client->set($this->path, file_get_contents($this->uri));
+            $this->did_flush = true;
             return fflush($this->file);
         } catch (\Exception $e) {
             return false;
@@ -287,6 +359,7 @@ class StreamWrapper
      */
     public function stream_seek($offset, $whence)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         if (! $this->seekable) {
             // File not seekable
             trigger_error(
@@ -322,6 +395,7 @@ class StreamWrapper
      */
     public function stream_write($data)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . substr($data, 0, 30) . ')');
         $length = fwrite($this->file, $data);
 
         if (false === $length) {
@@ -346,6 +420,7 @@ class StreamWrapper
      */
     public function unlink($path)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         $path = $this->trim_path($path);
 
         try {
@@ -372,6 +447,7 @@ class StreamWrapper
      */
     public function stream_stat()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         return fstat($this->file);
     }
 
@@ -399,8 +475,8 @@ class StreamWrapper
             'ino'     => 0,
             'mode'    => self::DIRECTORY_WRITABLE_MODE,
             'nlink'   => 0,
-            'uid'     => 0,
-            'gid'     => 0,
+            'uid'     => static::$user_info['uid'] ?? 0,
+            'gid'     => static::$user_info['gid'] ?? 0,
             'rdev'    => 0,
             'size'    => 0,
             'atime'   => 0,
@@ -411,6 +487,7 @@ class StreamWrapper
         );
 
         if ($this->is_dir($path)) {
+            $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ') -> DIR: ' . var_export($stats, true));
             return $stats;
         }
 
@@ -426,6 +503,7 @@ class StreamWrapper
             $stats[9]  = $stats['mtime'] = (int) $info['mtime'];
             $stats[10] = $stats['ctime'] = (int) $info['mtime'];
 
+            $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ') -> FILE: ' . var_export($stats, true));
             return $stats;
         } catch (\Stack\BlobStore\Exceptions\NotFound $e) {
             return false;
@@ -448,6 +526,7 @@ class StreamWrapper
      */
     public function stream_tell()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         return $this->file ? ftell($this->file) : false;
     }
 
@@ -464,6 +543,7 @@ class StreamWrapper
      */
     public function rename($path_from, $path_to)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         if ($path_from === $path_to) {
             // from and to path are identical so do nothing
             return true;
@@ -471,6 +551,8 @@ class StreamWrapper
 
         $path_from = $this->trim_path($path_from);
         $path_to = $this->trim_path($path_to);
+
+        error_log("### Rename {$path_from} -> {$path_to}");
 
         try {
             // Get original file first
@@ -485,7 +567,7 @@ class StreamWrapper
             $filePath = $meta['uri'];
 
             // Upload to file service
-            $this->client->set($filePath, file_get_contents($file_to));
+            $this->client->set($path_to, file_get_contents($filePath));
 
             // Delete old file
             $result = $this->client->remove($path_from);
@@ -515,8 +597,12 @@ class StreamWrapper
      */
     public function mkdir($path, $mode, $options)
     {
-        // Currently, it will always return true as directories are automatically created on the Filesystem API
-        return true;
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
+
+        $path = $this->trim_path($path);
+
+        // Allow creating only conforming directories.
+        return is_dir($path);
     }
 
     /**
@@ -532,6 +618,7 @@ class StreamWrapper
      */
     public function dir_opendir($path, $options)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         // Currently, returns true whenever the path is a directory
         if ($this->is_dir($path)) {
             $this->file = null;
@@ -552,6 +639,7 @@ class StreamWrapper
      */
     public function dir_closedir()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         // Currently, returns true whenever the path is a directory
         if ($this->is_dir($this->uri)) {
             $this->file = null;
@@ -572,6 +660,7 @@ class StreamWrapper
      */
     public function dir_rewinddir()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         // Currently, returns true whenever the path is a directory
         return $this->is_dir($this->uri);
     }
@@ -586,6 +675,7 @@ class StreamWrapper
      */
     public function dir_readdir()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         // Currently, it will always return false as directories are automatically created on the Filesystem API
         return false;
     }
@@ -606,6 +696,7 @@ class StreamWrapper
      */
     public function stream_metadata($path, $option, $value)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         // all meta operation are noop, for broader compaibility with media plugin ecosystem
         return true;
     }
@@ -624,6 +715,7 @@ class StreamWrapper
      */
     public function stream_cast($cast_as)
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         if (! is_null($this->file)) {
             return $this->file;
         }
@@ -667,6 +759,7 @@ class StreamWrapper
      */
     protected function close_handler()
     {
+        $this->debug && error_log('### '. __METHOD__ . '(' . var_export(func_get_args(), true) . ')');
         if (! $this->file) {
             return true;
         }
